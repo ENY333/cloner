@@ -38,13 +38,18 @@
     <div class="modal-box">
         <h3>🔑 Cấu Hình Google API Trước Khi Dùng</h3>
         <div class="guide-box">
-            <b>Các bước tạo miễn phí trên Google Cloud:</b>
+            <b>Các bước lấy Client ID và API Key miễn phí:</b>
             <ol>
-                <li>Vào <a href="https://console.cloud.google.com/" target="_blank" style="color:#38bdf8">Google Cloud Console</a>, tạo Project mới.</li>
-                <li>Mở mục <b>APIs & Services $\rightarrow$ Library</b>, bật <b>Google Drive API</b>.</li>
-                <li>Vào <b>Credentials $\rightarrow$ Create Credentials $\rightarrow$ OAuth client ID</b>.</li>
-                <li>Chọn <b>Web application</b>, tại <i>Authorized JavaScript origins</i> thêm link web GitHub của bạn (hoặc <code>http://localhost</code>).</li>
-                <li>Copy <b>Client ID</b> và <b>API Key</b> dán vào ô bên dưới.</li>
+                <li>Vào <a href="https://console.cloud.google.com/" target="_blank" style="color:#38bdf8">Google Cloud Console</a>, tạo một Project mới.</li>
+                <li>Vào <b>APIs & Services &rarr; Library</b>, tìm và bật <b>Google Drive API</b>.</li>
+                <li>Vào <b>Credentials &rarr; Create Credentials &rarr; API key</b> để lấy <b>API Key</b>.</li>
+                <li>Vào lại <b>Create Credentials &rarr; OAuth client ID</b>:
+                    <ul>
+                        <li>Chọn loại: <b>Web application</b>.</li>
+                        <li>Tại <b>Authorized JavaScript origins</b>, bấm thêm link trang web của bạn (ví dụ: <code>https://tên-bạn.github.io</code> hoặc <code>http://localhost</code>).</li>
+                    </ul>
+                </li>
+                <li>Bấm <b>Create</b> rồi sao chép chuỗi <b>Client ID</b> dán vào ô bên dưới.</li>
             </ol>
         </div>
 
