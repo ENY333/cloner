@@ -4,151 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drive Cloud Cloner</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #060913;
-      --card-surface: rgba(15, 23, 42, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --primary: #0284c7;
-      --primary-hover: #0ea5e9;
-      --primary-glow: rgba(14, 165, 233, 0.35);
-      --accent: #38bdf8;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      position: relative;
+    html, body {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
+      background-color: #07090e;
     }
-
-    /* Đốm sáng nền công nghệ */
-    .bg-glow-1 {
-      position: absolute;
-      width: 480px;
-      height: 480px;
-      background: radial-gradient(circle, rgba(14, 165, 233, 0.16) 0%, transparent 70%);
-      top: 15%;
-      left: 20%;
-      filter: blur(90px);
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .bg-glow-2 {
-      position: absolute;
-      width: 420px;
-      height: 420px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
-      bottom: 15%;
-      right: 20%;
-      filter: blur(80px);
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* Khung thẻ chính phong cách Glassmorphism */
-    .card {
-      position: relative;
-      z-index: 1;
+    iframe {
       width: 100%;
-      max-width: 440px;
-      background: var(--card-surface);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 40px 32px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      text-align: center;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      color: var(--accent);
-      padding: 5px 14px;
-      border-radius: 9999px;
-      font-size: 11.5px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    h2 {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #fff;
-      margin-bottom: 10px;
-    }
-
-    p {
-      color: var(--text-muted);
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 28px;
-    }
-
-    a.btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 15px;
-      box-shadow: 0 8px 24px var(--primary-glow);
-      transition: all 0.25s ease;
-    }
-
-    a.btn:hover {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px var(--primary-glow);
-    }
-
-    a.btn:active {
-      transform: translateY(0);
+      height: 100%;
+      border: none;
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <div class="bg-glow-1"></div>
-  <div class="bg-glow-2"></div>
-
-  <div class="card">
-    <div class="badge">⚡ Drive Server-to-Server</div>
-    <h2>Drive Cloud Cloner</h2>
-    <p>Nhân bản thư mục hoặc tệp Google Drive trực tiếp trên Cloud mà không tốn dung lượng máy.</p>
-    <a class="btn" href="https://script.google.com/macros/s/AKfycbyDJJXCANAJEfUPgpby7TDhXcnN3YmqRJZuhXe5CLQEr_2VhAmSaArD442cDjB4IQwT/exec">
-      <span>Mở Ứng Dụng</span>
-      <span style="font-size: 16px;">&rarr;</span>
-    </a>
-  </div>
+  <iframe 
+    src="https://script.google.com/macros/s/AKfycbyDJJXCANAJEfUPgpby7TDhXcnN3YmqRJZuhXe5CLQEr_2VhAmSaArD442cDjB4IQwT/exec" 
+    allow="clipboard-write">
+  </iframe>
 
 </body>
 </html>
