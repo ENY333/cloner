@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloud Tools Portal</title>
+  <title>Dashboard Công Cụ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #060913;
-      --card-bg: rgba(18, 24, 38, 0.7);
+      --card-bg: rgba(18, 24, 38, 0.75);
       --card-border: rgba(255, 255, 255, 0.08);
       --primary: #0284c7;
       --accent: #38bdf8;
-      --text: #f8fafc;
+      --text-main: #f8fafc;
       --text-dim: #94a3b8;
     }
 
@@ -23,40 +23,46 @@
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg);
-      color: var(--text);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
+      justify-content: center;
+      padding: 24px;
       position: relative;
       overflow-x: hidden;
     }
 
-    /* Hiệu ứng ánh sáng nền */
-    .glow-sphere {
+    /* Đốm sáng nền công nghệ */
+    .bg-glow {
       position: absolute;
-      width: 600px;
-      height: 600px;
+      width: 500px;
+      height: 500px;
       background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%);
-      top: 20%;
+      top: 50%;
       left: 50%;
-      transform: translate(-50%, -20%);
-      filter: blur(100px);
+      transform: translate(-50%, -50%);
+      filter: blur(90px);
       z-index: 0;
       pointer-events: none;
     }
 
-    .main-wrapper {
+    .wrapper {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 900px;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    header {
+    /* Tiêu đề trang chủ */
+    .portal-header {
       text-align: center;
-      margin-bottom: 45px;
+      margin-bottom: 30px;
+      transition: opacity 0.3s ease;
     }
 
     .badge {
@@ -66,170 +72,165 @@
       background: rgba(56, 189, 248, 0.1);
       border: 1px solid rgba(56, 189, 248, 0.25);
       color: var(--accent);
-      padding: 6px 16px;
+      padding: 5px 14px;
       border-radius: 9999px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
-    header p {
+    .subtitle {
       color: var(--text-dim);
-      font-size: 15px;
-      max-width: 500px;
-      margin: 0 auto;
-      line-height: 1.6;
+      font-size: 13.5px;
     }
 
-    /* Lưới danh sách công cụ (Tools Grid) */
+    /* Khu vực lưới công cụ */
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 600px;
     }
 
-    .tool-card {
+    /* Ô nhỏ Drive Cloner */
+    .tool-box {
       background: var(--card-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
+      border-radius: 16px;
       padding: 24px;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.25s ease;
-      cursor: pointer;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     }
 
-    .tool-card:hover {
-      transform: translateY(-4px);
+    .tool-box:hover {
+      transform: translateY(-3px);
       border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 16px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.15);
+      box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
     }
 
     .tool-icon {
-      font-size: 28px;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      margin-bottom: 16px;
+      font-size: 20px;
     }
 
-    .tool-card h3 {
-      font-size: 18px;
+    .tool-info h3 {
+      font-size: 16px;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
-    .tool-card p {
+    .tool-info p {
+      font-size: 12.5px;
       color: var(--text-dim);
-      font-size: 13.5px;
-      line-height: 1.5;
-      margin-bottom: 20px;
-      flex-grow: 1;
+      line-height: 1.4;
     }
 
-    .tool-btn {
-      display: flex;
+    /* Ô chờ để sau này thêm tool mới */
+    .tool-box.add-more {
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.01);
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 13.5px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
+      text-align: center;
+      min-height: 130px;
     }
 
-    .tool-card:hover .tool-btn {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    }
-
-    /* Thẻ công cụ chờ thêm mới (Placeholder) */
-    .tool-card.placeholder {
-      border: 1px dashed var(--card-border);
-      background: rgba(255, 255, 255, 0.01);
-      cursor: default;
-    }
-
-    .tool-card.placeholder:hover {
+    .tool-box.add-more:hover {
+      border-color: rgba(255, 255, 255, 0.3);
       transform: none;
       box-shadow: none;
-      border-color: var(--card-border);
     }
 
-    .placeholder-badge {
-      display: inline-block;
-      font-size: 11px;
+    .add-more-text {
+      font-size: 13px;
+      font-weight: 600;
       color: #64748b;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 4px 10px;
-      border-radius: 6px;
-      margin-top: auto;
-      width: fit-content;
     }
 
-    /* Khung mở ứng dụng trực tiếp tại chỗ (Không nhảy tab) */
-    #app-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #060913;
-      z-index: 999;
+    /* Khung hiển thị App trực tiếp ngay trên trang chủ */
+    #app-display-card {
       display: none;
+      width: 100%;
+      max-width: 650px;
+      height: 620px;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
       flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: zoomIn 0.25s ease-out forwards;
+    }
+
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .app-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 24px;
-      background: #0b1120;
+      padding: 12px 18px;
+      background: rgba(11, 17, 32, 0.85);
       border-bottom: 1px solid var(--card-border);
     }
 
-    .back-btn {
-      background: rgba(255, 255, 255, 0.08);
+    .app-title-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
       color: #fff;
+    }
+
+    .btn-close {
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--card-border);
-      padding: 8px 14px;
+      color: #cbd5e1;
+      padding: 6px 12px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
+      gap: 4px;
+      transition: 0.2s;
     }
 
-    .back-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: var(--accent);
+    .btn-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
     }
 
     iframe {
@@ -237,66 +238,74 @@
       height: 100%;
       border: none;
       flex-grow: 1;
+      background: transparent;
     }
   </style>
 </head>
 <body>
 
-  <div class="glow-sphere"></div>
+  <div class="bg-glow"></div>
 
-  <!-- Giao diện Trang Chủ Hub -->
-  <div class="main-wrapper" id="home-view">
-    <header>
-      <div class="badge">🚀 All-In-One Workspace</div>
+  <div class="wrapper">
+    <!-- Tiêu đề cổng trang chủ -->
+    <div class="portal-header" id="headerSection">
+      <div class="badge">Workspace</div>
       <h1>Trung Tâm Công Cụ</h1>
-      <p>Tổng hợp các tiện ích đám mây và tự động hóa xử lý dữ liệu trực tiếp trên Cloud.</p>
-    </header>
+      <p class="subtitle">Chọn công cụ để mở trực tiếp ngay trên trang chủ</p>
+    </div>
 
-    <div class="tools-grid">
-      <!-- CÔNG CỤ 1: DRIVE CLONER -->
-      <div class="tool-card" onclick="openApp('https://script.google.com/macros/s/AKfycbyDJJXCANAJEfUPgpby7TDhXcnN3YmqRJZuhXe5CLQEr_2VhAmSaArD442cDjB4IQwT/exec')">
+    <!-- Lưới các ô công cụ trên trang chủ -->
+    <div class="tools-grid" id="toolsGrid">
+      
+      <!-- Ô DRIVE CLOUD CLONER -->
+      <div class="tool-box" onclick="showApp('https://script.google.com/macros/s/AKfycbyDJJXCANAJEfUPgpby7TDhXcnN3YmqRJZuhXe5CLQEr_2VhAmSaArD442cDjB4IQwT/exec', '⚡ Drive Cloud Cloner')">
         <div class="tool-icon">⚡</div>
-        <h3>Drive Cloud Cloner</h3>
-        <p>Nhân bản thư mục & tệp từ Drive người khác sang Drive của bạn 100% chính chủ, không tốn ổ cứng.</p>
-        <button class="tool-btn">Mở Công Cụ &rarr;</button>
+        <div class="tool-info">
+          <h3>Drive Cloud Cloner</h3>
+          <p>Sao chép thư mục và file Drive sang tài khoản của bạn trực tiếp trên Cloud.</p>
+        </div>
       </div>
 
-      <!-- CÔNG CỤ 2: DÀNH ĐỂ BẠN THÊM SAU -->
-      <div class="tool-card placeholder">
-        <div class="tool-icon">📁</div>
-        <h3 style="color: #64748b;">Công cụ tiếp theo</h3>
-        <p>Chỗ trống dành cho tiện ích chuyển đổi file, quản lý dữ liệu hoặc bot tự động hóa tiếp theo.</p>
-        <span class="placeholder-badge">Sắp ra mắt</span>
+      <!-- Ô CHỜ SẴN (Sau này bạn thêm công cụ khác vào đây) -->
+      <div class="tool-box add-more">
+        <span class="add-more-text">+ Thêm công cụ khác</span>
       </div>
 
-      <!-- CÔNG CỤ 3: DÀNH ĐỂ BẠN THÊM SAU -->
-      <div class="tool-card placeholder">
-        <div class="tool-icon">⚙️</div>
-        <h3 style="color: #64748b;">Tiện ích mở rộng</h3>
-        <p>Thêm link các dự án web app, công cụ cá nhân khác của bạn vào đây bất kỳ lúc nào.</p>
-        <span class="placeholder-badge">Sắp ra mắt</span>
-      </div>
     </div>
-  </div>
 
-  <!-- Khung chạy App tại chỗ khi bấm vào (Không bao giờ mở tab mới) -->
-  <div id="app-container">
-    <div class="app-topbar">
-      <button class="back-btn" onclick="closeApp()">← Trở về Trang Chủ</button>
-      <span style="font-size: 13px; color: var(--text-dim);">Đang chạy trên nền máy chủ Google</span>
+    <!-- Khung mở công cụ Drive Cloner ngay trên nền trang chủ -->
+    <div id="app-display-card">
+      <div class="app-topbar">
+        <div class="app-title-tag" id="appTitle">⚡ Drive Cloud Cloner</div>
+        <button class="btn-close" onclick="closeApp()">✕ Đóng & Về Menu</button>
+      </div>
+      <iframe id="clonerFrame" src="" allow="clipboard-write"></iframe>
     </div>
-    <iframe id="app-frame" src="" allow="clipboard-write"></iframe>
   </div>
 
   <script>
-    function openApp(url) {
-      document.getElementById('app-frame').src = url;
-      document.getElementById('app-container').style.display = 'flex';
+    function showApp(url, title) {
+      document.getElementById('headerSection').style.display = 'none';
+      document.getElementById('toolsGrid').style.display = 'none';
+
+      const appCard = document.getElementById('app-display-card');
+      const frame = document.getElementById('clonerFrame');
+      const titleTag = document.getElementById('appTitle');
+
+      titleTag.innerText = title;
+      frame.src = url;
+      appCard.style.display = 'flex';
     }
 
     function closeApp() {
-      document.getElementById('app-container').style.display = 'none';
-      document.getElementById('app-frame').src = ''; // giải phóng bộ nhớ
+      const appCard = document.getElementById('app-display-card');
+      const frame = document.getElementById('clonerFrame');
+
+      appCard.style.display = 'none';
+      frame.src = ''; // Dọn bộ nhớ
+
+      document.getElementById('headerSection').style.display = 'block';
+      document.getElementById('toolsGrid').style.display = 'grid';
     }
   </script>
 
