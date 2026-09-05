@@ -72,6 +72,12 @@
       gap: 14px;
     }
 
+    @media (max-width: 480px) {
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .tool-box {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -112,6 +118,7 @@
       align-items: center;
       justify-content: center;
       cursor: default;
+      min-height: 110px;
     }
 
     .tool-box.add-more span {
@@ -120,13 +127,13 @@
       font-weight: 600;
     }
 
-    /* Khung hiển thị App */
+    /* Khung hiển thị App trên máy tính */
     #app-container {
       display: none;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 20px;
-      padding: 24px 28px;
+      padding: 20px 24px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     }
 
@@ -134,8 +141,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--card-border);
     }
 
@@ -163,7 +170,7 @@
 
     iframe {
       width: 100%;
-      height: 480px;
+      height: 490px;
       border: none;
       display: block;
     }
@@ -172,7 +179,6 @@
 <body>
 
   <div class="wrapper">
-    <!-- Giao diện Menu Trang Chủ -->
     <div id="home-view">
       <div class="badge">Workspace Portal</div>
       <h1>Trung Tâm Công Cụ</h1>
@@ -191,7 +197,6 @@
       </div>
     </div>
 
-    <!-- Khung mở App (Gọn gàng, không bị 2 lớp card) -->
     <div id="app-container">
       <div class="app-nav">
         <span class="app-tag" id="appTitle">⚡ Drive Cloud Cloner</span>
@@ -203,10 +208,19 @@
 
   <script>
     function launchApp(url, title) {
-      document.getElementById('home-view').style.display = 'none';
-      document.getElementById('appTitle').innerText = title;
-      document.getElementById('appFrame').src = url;
-      document.getElementById('app-container').style.display = 'block';
+      // Nhận diện thiết bị di động
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // Mở chuyển tiếp trên điện thoại để tránh lỗi chặn cookie từ iframe của Google
+        window.location.href = url;
+      } else {
+        // Mở trực tiếp trong khung nhúng trên máy tính
+        document.getElementById('home-view').style.display = 'none';
+        document.getElementById('appTitle').innerText = title;
+        document.getElementById('appFrame').src = url;
+        document.getElementById('app-container').style.display = 'block';
+      }
     }
 
     function closeApp() {
