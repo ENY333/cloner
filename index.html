@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drive Cloud Cloner - Cổng Bảo Mật</title>
+  <title>Drive Cloud Cloner - Full System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
     :root { --primary: #38bdf8; --card-border: rgba(255, 255, 255, 0.08); --card-bg: rgba(13, 19, 33, 0.95); --text: #f8fafc; --text-dim: #94a3b8; }
@@ -32,30 +32,56 @@
     
     .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); flex-shrink: 0; }
     .form-group { margin-bottom: 14px; }
+    .form-group:last-of-type { margin-bottom: 18px; }
     label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
     
     input[type="text"] { width: 100%; padding: 14px 16px; background: rgba(8, 12, 22, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
     input[type="text"]:focus { border-color: var(--primary); }
 
     .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    
+
     .active-tasks-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
     .section-title { font-size: 14px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
     .tasks-scroll-container { flex-grow: 1; overflow-y: auto; padding-right: 6px; padding-bottom: 10px; }
+    .tasks-scroll-container::-webkit-scrollbar { width: 6px; }
+    .tasks-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+    .tasks-scroll-container::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
     
-    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; }
+    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
     .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
     .task-name { font-size: 14px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; } 
-    .task-status { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 10px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); }
-    .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+    .task-status { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 10px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); white-space: nowrap; }
+    
+    .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .current-file-box span { color: #e2e8f0; font-weight: 600; }
+
     .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; font-size: 13px; color: var(--text-dim); background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; }
     .task-metrics span { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    
+    .metric-clickable { cursor: pointer; transition: 0.2s; padding: 4px; border-radius: 6px; }
+    .metric-clickable:hover { background: rgba(56, 189, 248, 0.15); color: var(--primary); }
+
+    .task-actions { display: flex; justify-content: flex-end; }
+
+    #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #060913; z-index: 9999; padding: 0; margin: 0; }
+    .modal-content { background: #0d1321; border: none; border-radius: 0; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+    .modal-header { padding: 24px 30px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 18px; color: var(--primary); flex-shrink: 0; }
+    .modal-close { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: var(--text-dim); font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s;}
+    .modal-close:hover { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+    .modal-body { padding: 24px 30px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; flex-grow: 1; }
+    .modal-body::-webkit-scrollbar { width: 8px; }
+    .modal-body::-webkit-scrollbar-track { background: transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
+    
+    .modal-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 3px solid var(--primary); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .modal-item-name { color: #f8fafc; font-weight: 600; margin-bottom: 8px; word-break: break-all; }
+    .modal-item-desc { color: var(--text-dim); font-size: 12px; }
+    .empty-msg { text-align: center; color: var(--text-dim); padding: 50px; font-size: 15px; }
   </style>
 </head>
 <body>
 
-  <!-- Màn hình nhập PIN trực tiếp trên GitHub -->
+  <!-- MÀN HÌNH KHÓA PIN -->
   <div id="pinScreen">
     <div class="pin-box">
       <div style="font-size: 32px; margin-bottom: 12px;">🛡️</div>
@@ -65,11 +91,11 @@
     </div>
   </div>
 
-  <!-- Giao diện chính sau khi mở khóa -->
+  <!-- GIAO DIỆN CHÍNH -->
   <div class="container" id="mainApp" style="display: none;">
     <div class="app-header">
       <div class="app-title">⚡ Drive Cloud Cloner</div>
-      <button class="btn-kill" onclick="lockApp()">🚪 Đăng xuất</button>
+      <button class="btn-kill" style="padding: 8px 16px; margin: 0;" onclick="lockApp()">🔒 Khóa lại</button>
     </div>
 
     <div class="form-box">
@@ -83,20 +109,34 @@
       </div>
       <button class="btn-submit" onclick="startNewTask()">Bắt Đầu Sao Chép Nền</button>
     </div>
+
     <div class="active-tasks-section" id="activeTasksSection" style="display:none;">
       <div class="section-title" id="sectionTitle">Tiến trình đang chạy ngầm</div>
       <div class="tasks-scroll-container" id="tasksListContainer"></div>
     </div>
   </div>
 
+  <!-- MODAL XEM CHI TIẾT TIẾN TRÌNH -->
+  <div id="infoModal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header" id="modalTitle">Chi tiết thông tin</div>
+      <div class="modal-body" id="modalListContainer"></div>
+    </div>
+  </div>
+
   <script>
+    // Link Google Apps Script của bạn được kết nối ngầm ở đây (chỉ dùng để chạy nền, không cần đăng nhập giao diện nữa)
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
+
+    const CORRECT_PIN = "5450";
 
     function checkPin() {
       const pin = document.getElementById('pinInput').value;
-      if (pin === "5450") {
+      if (pin === CORRECT_PIN) {
         document.getElementById('pinScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
+        loadTasksStatus();
+        setInterval(loadTasksStatus, 4000);
       } else {
         alert('Mã PIN không đúng!');
       }
@@ -112,8 +152,97 @@
       const src = document.getElementById('srcUrl').value.trim();
       const dst = document.getElementById('dstUrl').value.trim();
       if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
-      alert('Đã nhận yêu cầu! (Hệ thống chạy ngầm qua GAS)');
+
+      // Gửi yêu cầu ngầm tới GAS thông qua fetch JSONP/POST
+      const targetUrl = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst);
+      
+      fetch(targetUrl, { mode: 'no-cors' })
+        .then(() => {
+          document.getElementById('srcUrl').value = '';
+          document.getElementById('dstUrl').value = '';
+          setTimeout(loadTasksStatus, 1500);
+        })
+        .catch(err => alert('Lỗi kết nối: ' + err));
     }
+
+    let globalTasksData = [];
+
+    function loadTasksStatus() {
+      fetch(GAS_URL + "?action=list")
+        .then(res => res.json())
+        .then(tasks => {
+          if (!tasks || tasks.length === 0) {
+            document.getElementById('activeTasksSection').style.display = 'none';
+            return;
+          }
+          globalTasksData = tasks;
+          let html = '';
+          let activeCount = 0;
+
+          tasks.forEach(t => {
+            activeCount++;
+            let displayName = t.taskName ? t.taskName : ('Task: ' + t.id);
+            html += `
+              <div class="task-item-card">
+                <div class="task-top">
+                  <div class="task-name">📂 ${displayName}</div>
+                  <div class="task-status">${t.statusMsg}</div>
+                </div>
+                <div class="current-file-box">
+                  Đang xử lý: <span>${t.lastFile || 'Đang kết nối...'}</span>
+                </div>
+                <div class="task-metrics">
+                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'scanned')">Quét: <span>${t.totalScanned}</span></div>
+                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'copied')">Thành công: <span>${t.copiedFiles}</span></div>
+                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'queued')">Chờ 24h: <span>${t.queuedFiles}</span></div>
+                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'skipped')">Bỏ qua: <span>${t.skippedFiles}</span></div>
+                </div>
+                <div class="task-actions">
+                  <button class="btn-kill" onclick="killTask('${t.id}')">Dừng tiến trình</button>
+                </div>
+              </div>
+            `;
+          });
+
+          document.getElementById('activeTasksSection').style.display = 'flex';
+          document.getElementById('sectionTitle').innerText = `Tiến trình đang chạy ngầm (${activeCount})`;
+          document.getElementById('tasksListContainer').innerHTML = html;
+        })
+        .catch(() => {});
+    }
+
+    function killTask(taskId) {
+      fetch(GAS_URL + "?action=kill&id=" + taskId, { mode: 'no-cors' })
+        .then(() => setTimeout(loadTasksStatus, 1000));
+    }
+
+    function openDetailModal(taskId, type) {
+      const task = globalTasksData.find(t => t.id === taskId);
+      if (!task) return;
+      let title = "Chi tiết tiến trình";
+      let listData = [];
+
+      if (type === 'scanned') { title = "📂 Tệp đã quét"; listData = task.scannedList || []; }
+      else if (type === 'copied') { title = "✅ Thành công"; listData = task.copiedList || []; }
+      else if (type === 'queued') { title = "⏳ Chờ 24h"; listData = task.retryQueue || []; }
+      else if (type === 'skipped') { title = "🚫 Bỏ qua"; listData = task.skippedList || []; }
+
+      document.getElementById('modalTitle').innerHTML = `<span>${title}</span><button class="modal-close" onclick="closeModal()">Đóng lại ✕</button>`;
+      
+      let listHtml = '';
+      if (listData.length === 0) {
+        listHtml = '<div class="empty-msg">✨ Chưa có dữ liệu.</div>';
+      } else {
+        listData.forEach(item => {
+          let name = item.name || item.fileName || "Tệp ẩn danh";
+          listHtml += `<div class="modal-item"><div class="modal-item-name">📄 ${name}</div></div>`;
+        });
+      }
+      document.getElementById('modalListContainer').innerHTML = listHtml;
+      document.getElementById('infoModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
   </script>
 </body>
 </html>
