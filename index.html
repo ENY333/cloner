@@ -37,15 +37,6 @@
     .empty-icon { font-size:54px; opacity:.75; margin-bottom:14px; }
     .empty-title { font-size:17px; font-weight:800; margin-bottom:8px; }
     .empty-subtitle { color:var(--text-dim); font-size:13px; line-height:1.5; }
-    .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:4px; }
-    .summary-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:18px; display:grid; grid-template-columns:64px 1fr; align-items:center; gap:14px; }
-    .summary-icon { width:64px; height:64px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:31px; background:rgba(56,189,248,.12); }
-    .summary-card:nth-child(2) .summary-icon { background:rgba(34,197,94,.14); }
-    .summary-card:nth-child(3) .summary-icon { background:rgba(245,158,11,.14); }
-    .summary-card:nth-child(4) .summary-icon { background:rgba(239,68,68,.14); }
-    .summary-label { color:#cbd5e1; font-size:12px; margin-bottom:5px; }
-    .summary-value { font-size:24px; font-weight:800; }
-    .summary-desc { color:var(--text-dim); font-size:10px; margin-top:4px; }
     .footer-note { text-align:center; color:var(--text-dim); font-size:12px; margin:26px 0 8px; }
     .app-title { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--primary); }
     .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
@@ -85,8 +76,7 @@
     .api-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#64748b; margin-right:5px; }
     .api-dot.online { background:#22c55e; }
     .api-dot.offline { background:#ef4444; }
-    @media (max-width: 800px) { .summary-grid { grid-template-columns:repeat(2,1fr); } }
-    @media (max-width: 600px) { .task-metrics { grid-template-columns: repeat(2, 1fr); } .summary-grid { grid-template-columns:1fr; } .app-header { align-items:flex-start; } .api-status { margin-top:5px; } .backend-badge { padding:7px 10px; } .task-toolbar { flex-wrap:wrap; } .toolbar-spacer { display:none; } }
+    @media (max-width: 600px) { .task-metrics { grid-template-columns: repeat(2, 1fr); } .app-header { align-items:flex-start; } .api-status { margin-top:5px; } .backend-badge { padding:7px 10px; } .task-toolbar { flex-wrap:wrap; } .toolbar-spacer { display:none; } }
   </style>
 </head>
 <body>
@@ -123,12 +113,6 @@
         <label class="toggle-wrap"><span class="toggle"><input id="autoRefreshToggle" type="checkbox" checked onchange="toggleAutoRefresh()"><span class="slider"></span></span>Tự động cập nhật (8s)</label>
       </div>
       <div id="tasksListContainer"></div>
-      <div class="summary-grid" id="summaryGrid">
-        <div class="summary-card"><div class="summary-icon">🔎</div><div><div class="summary-label">Tổng đã quét</div><div class="summary-value" id="sumScanned">0</div><div class="summary-desc">Tổng số file và thư mục đã quét</div></div></div>
-        <div class="summary-card"><div class="summary-icon">✅</div><div><div class="summary-label">Đã sao chép</div><div class="summary-value" id="sumCopied">0</div><div class="summary-desc">Số file đã sao chép thành công</div></div></div>
-        <div class="summary-card"><div class="summary-icon">🕘</div><div><div class="summary-label">Đang chờ</div><div class="summary-value" id="sumQueued">0</div><div class="summary-desc">Số file đang chờ xử lý</div></div></div>
-        <div class="summary-card"><div class="summary-icon">❌</div><div><div class="summary-label">Bỏ qua</div><div class="summary-value" id="sumSkipped">0</div><div class="summary-desc">Số file bị bỏ qua</div></div></div>
-      </div>
       <div class="footer-note">Drive Cloud Cloner | Phiên bản đầy đủ - Không giới hạn - Miễn phí sử dụng</div>
     </div>
   </div>
@@ -239,20 +223,6 @@
 
     let autoRefreshTimer = null;
 
-    function updateSummary(tasks) {
-      const totals = {scanned:0, copied:0, queued:0, skipped:0};
-      (tasks || []).forEach(function(t) {
-        totals.scanned += Number(t.totalScanned) || 0;
-        totals.copied += Number(t.copiedFiles) || 0;
-        totals.queued += Number(t.queuedFiles) || 0;
-        totals.skipped += Number(t.skippedFiles) || 0;
-      });
-      document.getElementById('sumScanned').innerText = totals.scanned;
-      document.getElementById('sumCopied').innerText = totals.copied;
-      document.getElementById('sumQueued').innerText = totals.queued;
-      document.getElementById('sumSkipped').innerText = totals.skipped;
-    }
-
     function toggleAutoRefresh() {
       const enabled = document.getElementById('autoRefreshToggle').checked;
       if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
@@ -271,12 +241,10 @@
         if (!Array.isArray(tasks) || tasks.length === 0) {
           titleEl.innerText = 'Tiến trình đang chạy ngầm';
           container.innerHTML = '<div class="empty-card"><div class="empty-icon">📁</div><div class="empty-title">Hiện chưa có tiến trình nào đang chạy.</div><div class="empty-subtitle">Nhập link thư mục nguồn và đích ở trên và bấm “Bắt Đầu Sao Chép Nền” để tạo tiến trình mới.</div></div>';
-          updateSummary([]);
           globalTasksData = [];
           return;
         }
         globalTasksData = tasks;
-        updateSummary(tasks);
         let html = '';
         tasks.forEach(t => {
           const id = escapeHtml(t.id || '');
