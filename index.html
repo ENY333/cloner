@@ -57,8 +57,6 @@
     .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
     .btn-kill:hover { background: rgba(239, 68, 68, 0.3); }
 
-    #hiddenFrame { display: none; }
-
     #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #060913; z-index: 9999; padding: 0; margin: 0; }
     .modal-content { background: #0d1321; border: none; border-radius: 0; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
     .modal-header { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; color: var(--primary); }
@@ -111,8 +109,6 @@
     </div>
   </div>
 
-  <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
-
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
     const CORRECT_PIN = "5450";
@@ -123,7 +119,7 @@
         document.getElementById('pinScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         loadTasksStatus();
-        setInterval(loadTasksStatus, 8000); // Đã chỉnh giãn thời gian gọi thành 8 giây để chống lag
+        setInterval(loadTasksStatus, 8000);
       } else {
         alert('Mã PIN không đúng!');
       }
@@ -134,22 +130,18 @@
       const dst = document.getElementById('dstUrl').value.trim();
       if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
 
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = GAS_URL;
-      form.target = 'hiddenFrame';
-
-      const act = document.createElement('input'); act.name = 'action'; act.value = 'create'; form.appendChild(act);
-      const s = document.createElement('input'); s.name = 'src'; s.value = src; form.appendChild(s);
-      const d = document.createElement('input'); d.name = 'dst'; d.value = dst; form.appendChild(d);
-
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
-
-      document.getElementById('srcUrl').value = '';
-      document.getElementById('dstUrl').value = '';
-      setTimeout(loadTasksStatus, 1500);
+      const targetUrl = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst);
+      
+      fetch(targetUrl, { mode: 'no-cors' })
+        .then(() => {
+          document.getElementById('srcUrl').value = '';
+          document.getElementById('dstUrl').value = '';
+          setTimeout(loadTasksStatus, 1500);
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Lỗi kết nối tới hệ thống ngầm!');
+        });
     }
 
     let globalTasksData = [];
@@ -214,18 +206,10 @@
     }
 
     function killTask(taskId) {
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = GAS_URL;
-      form.target = 'hiddenFrame';
-
-      const act = document.createElement('input'); act.name = 'action'; act.value = 'kill'; form.appendChild(act);
-      const id = document.createElement('input'); id.name = 'id'; id.value = taskId; form.appendChild(id);
-
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
-      setTimeout(loadTasksStatus, 1000);
+      const targetUrl = GAS_URL + "?action=kill&id=" + taskId;
+      fetch(targetUrl, { mode: 'no-cors' })
+        .then(() => setTimeout(loadTasksStatus, 1000))
+        .catch(err => console.error(err));
     }
 
     function openDetailModal(taskId, type) {
