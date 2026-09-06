@@ -23,19 +23,10 @@
     .backend-badge .api-dot { margin:0; }
     .form-help { color:var(--text-dim); font-size:12px; margin-top:14px; line-height:1.5; }
     
-    /* STYLE MỚI CHO THANH CÔNG CỤ (Nút Làm Mới & Toggle) */
     .task-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
     .toolbar-spacer { flex:1; }
     .btn-secondary { background:rgba(255,255,255,.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; transition:0.2s; display: flex; align-items: center; justify-content: center;}
     .btn-secondary:hover { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,0.25); color: #fff; }
-    .toggle-wrap { display:flex; align-items:center; gap:8px; color:#cbd5e1; font-size:12.5px; font-weight:600; }
-    
-    .toggle { position:relative; width:42px; height:24px; }
-    .toggle input { opacity:0; width:0; height:0; }
-    .slider { position:absolute; inset:0; cursor:pointer; border-radius:999px; background:#334155; transition:.2s; }
-    .slider:before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; border-radius:50%; background:white; transition:.2s; }
-    .toggle input:checked + .slider { background:#0ea5e9; }
-    .toggle input:checked + .slider:before { transform:translateX(18px); }
     
     .empty-card { min-height:190px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:30px; }
     .empty-icon { font-size:54px; opacity:.75; margin-bottom:14px; }
@@ -113,14 +104,8 @@
       <div class="task-toolbar">
         <div class="section-title" id="sectionTitle" style="margin:0">TIẾN TRÌNH ĐANG CHẠY NGẦM</div>
         <div class="toolbar-spacer"></div>
-        <button class="btn-secondary" onclick="manualRefresh()">↻ Làm mới</button>
-        <label class="toggle-wrap">
-          <span class="toggle">
-            <input id="autoRefreshToggle" type="checkbox" checked onchange="toggleAutoRefresh()">
-            <span class="slider"></span>
-          </span>
-          <span id="countdownText">Tự động cập nhật (8s)</span>
-        </label>
+        <!-- Nút Làm Mới thủ công -->
+        <button class="btn-secondary" onclick="loadTasksStatus()">↻ Làm mới</button>
       </div>
       <div id="tasksListContainer"></div>
       <div class="footer-note">Drive Cloud Cloner | Phiên bản đầy đủ - Không giới hạn - Miễn phí sử dụng</div>
@@ -140,11 +125,6 @@
     let globalTasksData = [];
     let pollingStarted = false;
     let requestBusy = false;
-    
-    // BIẾN CHO BỘ ĐẾM THỜI GIAN
-    let autoRefreshTimer = null;
-    let countdownValue = 8;
-    const REFRESH_INTERVAL = 8;
 
     function escapeHtml(value) {
       return String(value == null ? '' : value).replace(/[&<>'"]/g, function(c) {
@@ -159,9 +139,11 @@
         document.getElementById('mainApp').style.display = 'flex';
         loadTasksStatus();
         checkApiHealth();
+        
+        // Âm thầm chạy cập nhật ngầm mỗi 8 giây
         if (!pollingStarted) {
           pollingStarted = true;
-          toggleAutoRefresh(); // Kích hoạt bộ đếm thời gian
+          setInterval(loadTasksStatus, 8000);
         }
       } else {
         alert('Mã PIN không đúng!');
@@ -246,53 +228,12 @@
           if (res && res.success) {
             document.getElementById('srcUrl').value = '';
             document.getElementById('dstUrl').value = '';
-            manualRefresh(); // Gọi làm mới ngay lập tức
+            loadTasksStatus();
           } else {
             alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ nguyên nhân') : 'Không rõ nguyên nhân'));
           }
         }, 40000);
       }, 15000);
-    }
-
-    // HÀM XỬ LÝ ĐẾM NGƯỢC THỜI GIAN THỰC
-    function toggleAutoRefresh() {
-      const enabled = document.getElementById('autoRefreshToggle').checked;
-      const textLabel = document.getElementById('countdownText');
-      
-      if (autoRefreshTimer) { 
-        clearInterval(autoRefreshTimer); 
-        autoRefreshTimer = null; 
-      }
-      
-      if (enabled) {
-        countdownValue = REFRESH_INTERVAL;
-        textLabel.innerText = `Tự động cập nhật (${countdownValue}s)`;
-        autoRefreshTimer = setInterval(tickCountdown, 1000);
-      } else {
-        textLabel.innerText = 'Tự động cập nhật (Tắt)';
-      }
-    }
-
-    function tickCountdown() {
-      countdownValue--;
-      const textLabel = document.getElementById('countdownText');
-      
-      if (countdownValue <= 0) {
-        textLabel.innerText = `Đang làm mới...`;
-        loadTasksStatus();
-        countdownValue = REFRESH_INTERVAL; // Chạy xong thì reset lại đếm ngược
-      } else {
-        textLabel.innerText = `Tự động cập nhật (${countdownValue}s)`;
-      }
-    }
-
-    // KHI BẤM NÚT "LÀM MỚI" BẰNG TAY
-    function manualRefresh() {
-      loadTasksStatus();
-      if (document.getElementById('autoRefreshToggle').checked) {
-        countdownValue = REFRESH_INTERVAL;
-        document.getElementById('countdownText').innerText = `Đang làm mới...`;
-      }
     }
 
     function loadTasksStatus() {
@@ -340,11 +281,6 @@
         });
         titleEl.innerText = `Tiến trình đang chạy ngầm (${tasks.length})`;
         container.innerHTML = html;
-        
-        // Reset text nếu làm mới xong nhanh
-        if (document.getElementById('autoRefreshToggle').checked) {
-          document.getElementById('countdownText').innerText = `Tự động cập nhật (${countdownValue}s)`;
-        }
       }, 15000);
     }
 
@@ -353,7 +289,7 @@
       jsonpRequest('kill', {id: taskId}, function(err, res) {
         if (err) return alert(err.message);
         if (!res || !res.success) return alert('Không thể dừng tiến trình.');
-        manualRefresh();
+        loadTasksStatus();
       }, 15000);
     }
 
