@@ -91,7 +91,7 @@
     </div>
   </div>
 
-  <!-- GIAO DIỆN CHÍNH (Đã xóa sạch nút Đăng xuất / Khóa lại) -->
+  <!-- GIAO DIỆN CHÍNH -->
   <div class="container" id="mainApp" style="display: none;">
     <div class="app-header">
       <div class="app-title">⚡ Drive Cloud Cloner</div>
@@ -115,7 +115,7 @@
     </div>
   </div>
 
-  <!-- MODAL XEM CHI TIẾT TIẾN TRÌNH -->
+  <!-- MODAL XEM CHI TIẾT -->
   <div id="infoModal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header" id="modalTitle">Chi tiết thông tin</div>
@@ -144,66 +144,83 @@
       const dst = document.getElementById('dstUrl').value.trim();
       if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
 
-      const targetUrl = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst);
-      
-      fetch(targetUrl, { mode: 'no-cors' })
-        .then(() => {
+      const callbackName = 'cb_' + Math.random().toString(36).substring(7);
+      window[callbackName] = function(res) {
+        delete window[callbackName];
+        if (res && res.success) {
           document.getElementById('srcUrl').value = '';
           document.getElementById('dstUrl').value = '';
-          setTimeout(loadTasksStatus, 1500);
-        })
-        .catch(err => alert('Lỗi kết nối: ' + err));
+          loadTasksStatus();
+          alert('Đã khởi tạo tiến trình sao chép thành công!');
+        } else {
+          alert('Lỗi: ' + (res ? res.error : 'Không thể tạo task'));
+        }
+      };
+
+      const script = document.createElement('script');
+      script.src = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst) + "&callback=" + callbackName;
+      document.body.appendChild(script);
+      setTimeout(() => script.remove(), 5000);
     }
 
     let globalTasksData = [];
 
     function loadTasksStatus() {
-      fetch(GAS_URL + "?action=list")
-        .then(res => res.json())
-        .then(tasks => {
-          if (!tasks || tasks.length === 0) {
-            document.getElementById('activeTasksSection').style.display = 'none';
-            return;
-          }
-          globalTasksData = tasks;
-          let html = '';
-          let activeCount = 0;
+      const callbackName = 'list_cb_' + Math.random().toString(36).substring(7);
+      window[callbackName] = function(tasks) {
+        delete window[callbackName];
+        if (!tasks || tasks.length === 0) {
+          document.getElementById('activeTasksSection').style.display = 'none';
+          return;
+        }
+        globalTasksData = tasks;
+        let html = '';
+        let activeCount = 0;
 
-          tasks.forEach(t => {
-            activeCount++;
-            let displayName = t.taskName ? t.taskName : ('Task: ' + t.id);
-            html += `
-              <div class="task-item-card">
-                <div class="task-top">
-                  <div class="task-name">📂 ${displayName}</div>
-                  <div class="task-status">${t.statusMsg}</div>
-                </div>
-                <div class="current-file-box">
-                  Đang xử lý: <span>${t.lastFile || 'Đang kết nối...'}</span>
-                </div>
-                <div class="task-metrics">
-                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'scanned')">Quét: <span>${t.totalScanned}</span></div>
-                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'copied')">Thành công: <span>${t.copiedFiles}</span></div>
-                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'queued')">Chờ 24h: <span>${t.queuedFiles}</span></div>
-                  <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'skipped')">Bỏ qua: <span>${t.skippedFiles}</span></div>
-                </div>
-                <div class="task-actions">
-                  <button class="btn-kill" onclick="killTask('${t.id}')">Dừng tiến trình</button>
-                </div>
+        tasks.forEach(t => {
+          activeCount++;
+          let displayName = t.taskName ? t.taskName : ('Task: ' + t.id);
+          html += `
+            <div class="task-item-card">
+              <div class="task-top">
+                <div class="task-name">📂 ${displayName}</div>
+                <div class="task-status">${t.statusMsg}</div>
               </div>
-            `;
-          });
+              <div class="current-file-box">
+                Đang xử lý: <span>${t.lastFile || 'Đang kết nối...'}</span>
+              </div>
+              <div class="task-metrics">
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'scanned')">Quét: <span>${t.totalScanned}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'copied')">Thành công: <span>${t.copiedFiles}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'queued')">Chờ 24h: <span>${t.queuedFiles}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'skipped')">Bỏ qua: <span>${t.skippedFiles}</span></div>
+              </div>
+              <div class="task-actions">
+                <button class="btn-kill" onclick="killTask('${t.id}')">Dừng tiến trình</button>
+              </div>
+            </div>
+          `;
+        });
 
-          document.getElementById('activeTasksSection').style.display = 'flex';
-          document.getElementById('sectionTitle').innerText = `Tiến trình đang chạy ngầm (${activeCount})`;
-          document.getElementById('tasksListContainer').innerHTML = html;
-        })
-        .catch(() => {});
+        document.getElementById('activeTasksSection').style.display = 'flex';
+        document.getElementById('sectionTitle').innerText = `Tiến trình đang chạy ngầm (${activeCount})`;
+        document.getElementById('tasksListContainer').innerHTML = html;
+      };
+
+      const script = document.createElement('script');
+      script.src = GAS_URL + "?action=list&callback=" + callbackName;
+      document.body.appendChild(script);
+      setTimeout(() => script.remove(), 5000);
     }
 
     function killTask(taskId) {
-      fetch(GAS_URL + "?action=kill&id=" + taskId, { mode: 'no-cors' })
-        .then(() => setTimeout(loadTasksStatus, 1000));
+      const script = document.createElement('script');
+      script.src = GAS_URL + "?action=kill&id=" + taskId;
+      document.body.appendChild(script);
+      setTimeout(() => {
+        script.remove();
+        loadTasksStatus();
+      }, 1000);
     }
 
     function openDetailModal(taskId, type) {
@@ -225,7 +242,13 @@
       } else {
         listData.forEach(item => {
           let name = item.name || item.fileName || "Tệp ẩn danh";
-          listHtml += `<div class="modal-item"><div class="modal-item-name">📄 ${name}</div></div>`;
+          let desc = item.reason || 'Đang xử lý';
+          listHtml += `
+            <div class="modal-item">
+              <div class="modal-item-name">📄 ${name}</div>
+              <div class="modal-item-desc">Trạng thái: ${desc}</div>
+            </div>
+          `;
         });
       }
       document.getElementById('modalListContainer').innerHTML = listHtml;
