@@ -5,31 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drive Cloud Cloner</title>
   <style>
-    /* Xóa sạch mọi khoảng trống, lề mảng của trang web Github */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden; /* Chặn hoàn toàn thanh cuộn thừa ở trang ngoài */
-      background-color: #060913; /* Màu nền đồng bộ với App để không bị chớp trắng */
-    }
-
-    /* Ép khung Iframe chứa App phải bung tràn phẳng lì 4 góc */
-    iframe {
-      width: 100vw;
-      height: 100vh;
-      border: none; /* Xóa viền đen của Iframe */
-      display: block;
-      margin: 0;
-      padding: 0;
-    }
+    /* Xóa bỏ viền trắng thừa, căn toàn màn hình */
+    body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #060913; }
+    iframe { border: none; width: 100vw; height: 100vh; display: block; }
   </style>
 </head>
 <body>
 
-  <!-- Link Web App của bạn đã được gắn chuẩn xác vào đây -->
-  <iframe src="https://script.google.com/macros/s/AKfycbyDJJXCANAJEfUPgpby7TDhXcnN3YmqRJZuhXe5CLQEr_2VhAmSaArD442cDjB4IQwT/exec" allowfullscreen></iframe>
+  <!-- Khung iframe trống để giấu link gốc -->
+  <iframe id="appFrame" allowfullscreen></iframe>
+
+  <script>
+    // Mã Base64 chứa link Google Script của bạn
+    const secretKey = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5REpKWENBTkFKRWZVUGdwYnk3VERoWGNuTjNZbXFSSlp1aFhlNUNMUUVyXzJWaEFtU2FBckQ0NDJjRGpCNElRd1QvZXhlYw=="; 
+    
+    // Trình duyệt tự động giải mã và chèn link chạy ngầm
+    document.getElementById("appFrame").src = atob(secretKey);
+  </script>
 
 </body>
 </html>
