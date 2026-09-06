@@ -48,11 +48,12 @@
     .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
     .current-file-box span { color: #e2e8f0; font-weight: 600; }
 
-    /* ĐÃ GOM THÀNH 1 HÀNG NGANG DUY NHẤT Ở ĐÂY */
-    .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 11.5px; color: var(--text-dim); background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; }
-    .task-metrics span { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-    .metric-clickable { cursor: pointer; transition: 0.2s; padding: 2px; border-radius: 4px; }
-    .metric-clickable:hover { background: rgba(56, 189, 248, 0.15); color: var(--primary); }
+    /* 4 Ô THỐNG KÊ NẰM NGANG */
+    .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .metric-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); padding: 10px 6px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
+    .metric-box:hover { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); }
+    .metric-label { font-size: 10.5px; color: var(--text-dim); margin-bottom: 4px; font-weight: 600; }
+    .metric-value { font-size: 13px; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
     .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
     .btn-kill:hover { background: rgba(239, 68, 68, 0.3); }
@@ -181,10 +182,22 @@
                 Đang xử lý: <span>${t.lastFile || 'Đang kết nối...'}</span>
               </div>
               <div class="task-metrics">
-                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'scanned')">Quét: <span>${t.totalScanned}</span></div>
-                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'copied')">Thành công: <span>${t.copiedFiles}</span></div>
-                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'queued')">Chờ 24h: <span>${t.queuedFiles}</span></div>
-                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'skipped')">Bỏ qua: <span>${t.skippedFiles}</span></div>
+                <div class="metric-box" onclick="openDetailModal('${t.id}', 'scanned')">
+                  <div class="metric-label">Quét</div>
+                  <div class="metric-value">${t.totalScanned}</div>
+                </div>
+                <div class="metric-box" onclick="openDetailModal('${t.id}', 'copied')">
+                  <div class="metric-label">Thành công</div>
+                  <div class="metric-value">${t.copiedFiles}</div>
+                </div>
+                <div class="metric-box" onclick="openDetailModal('${t.id}', 'queued')">
+                  <div class="metric-label">Chờ 24h</div>
+                  <div class="metric-value">${t.queuedFiles}</div>
+                </div>
+                <div class="metric-box" onclick="openDetailModal('${t.id}', 'skipped')">
+                  <div class="metric-label">Bỏ qua</div>
+                  <div class="metric-value">${t.skippedFiles}</div>
+                </div>
               </div>
               <button class="btn-kill" onclick="killTask('${t.id}')">Dừng tiến trình</button>
             </div>
