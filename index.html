@@ -130,18 +130,22 @@
       const dst = document.getElementById('dstUrl').value.trim();
       if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
 
-      const targetUrl = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst);
-      
-      fetch(targetUrl, { mode: 'no-cors' })
-        .then(() => {
+      const cb = 'create_cb_' + Math.random().toString(36).substring(7);
+      window[cb] = function(res) {
+        delete window[cb];
+        if (res && res.success) {
           document.getElementById('srcUrl').value = '';
           document.getElementById('dstUrl').value = '';
-          setTimeout(loadTasksStatus, 1500);
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Lỗi kết nối tới hệ thống ngầm!');
-        });
+          loadTasksStatus();
+        } else {
+          alert('Lỗi tạo tiến trình: ' + (res ? res.error : 'Không rõ nguyên nhân'));
+        }
+      };
+
+      const s = document.createElement('script');
+      s.src = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst) + "&callback=" + cb;
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 5000);
     }
 
     let globalTasksData = [];
@@ -206,10 +210,16 @@
     }
 
     function killTask(taskId) {
-      const targetUrl = GAS_URL + "?action=kill&id=" + taskId;
-      fetch(targetUrl, { mode: 'no-cors' })
-        .then(() => setTimeout(loadTasksStatus, 1000))
-        .catch(err => console.error(err));
+      const cb = 'kill_cb_' + Math.random().toString(36).substring(7);
+      window[cb] = function() {
+        delete window[cb];
+        loadTasksStatus();
+      };
+
+      const s = document.createElement('script');
+      s.src = GAS_URL + "?action=kill&id=" + taskId + "&callback=" + cb;
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 5000);
     }
 
     function openDetailModal(taskId, type) {
