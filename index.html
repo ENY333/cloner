@@ -202,23 +202,41 @@
       btn.disabled = true;
       btn.innerText = 'Đang khởi tạo...';
 
-      jsonpRequest('create', {src: src, dst: dst}, function(err, res) {
-        requestBusy = false;
-        btn.disabled = false;
-        btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
-        if (err) {
-          alert(err.message);
-          loadTasksStatus();
-          return;
+      // Kiểm tra quyền Drive trước khi tạo task để báo đúng lỗi nguồn/đích.
+      jsonpRequest('diagnose', {src: src, dst: dst}, function(diagErr, diag) {
+        if (diagErr) {
+          requestBusy = false;
+          btn.disabled = false;
+          btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
+          return alert('Không kiểm tra được quyền Drive: ' + diagErr.message);
         }
-        if (res && res.success) {
-          document.getElementById('srcUrl').value = '';
-          document.getElementById('dstUrl').value = '';
-          loadTasksStatus();
-        } else {
-          alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ nguyên nhân') : 'Không rõ nguyên nhân'));
+        if (!diag || !diag.success) {
+          requestBusy = false;
+          btn.disabled = false;
+          btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
+          const se = diag && diag.source ? diag.source.error : 'Không rõ';
+          const de = diag && diag.destination ? diag.destination.error : 'Không rõ';
+          return alert('Không đủ quyền Google Drive.\n\nNguồn: ' + (diag && diag.source && diag.source.ok ? 'OK' : se) + '\nĐích: ' + (diag && diag.destination && diag.destination.ok ? 'OK' : de) + '\n\nHãy cấp quyền cho tài khoản chạy Apps Script và Deploy Web App với Execute as: Me.');
         }
-      }, 40000);
+
+        jsonpRequest('create', {src: src, dst: dst}, function(err, res) {
+          requestBusy = false;
+          btn.disabled = false;
+          btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
+          if (err) {
+            alert(err.message);
+            loadTasksStatus();
+            return;
+          }
+          if (res && res.success) {
+            document.getElementById('srcUrl').value = '';
+            document.getElementById('dstUrl').value = '';
+            loadTasksStatus();
+          } else {
+            alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ nguyên nhân') : 'Không rõ nguyên nhân'));
+          }
+        }, 40000);
+      }, 15000);
     }
 
     let autoRefreshTimer = null;
