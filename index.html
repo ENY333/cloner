@@ -26,7 +26,7 @@
     .btn-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; }
     .btn-submit:hover { box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); }
 
-    .container { width: 100%; height: 100%; max-width: 100%; padding: 30px 4%; display: flex; flex-direction: column; }
+    .container { width: 100%; height: 100%; max-width: 100%; padding: 30px 4%; display: flex; flex-direction: column; overflow-y: auto; }
     .app-header { display: flex; align-items: center; margin-bottom: 24px; flex-shrink: 0; }
     .app-title { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--primary); }
     
@@ -40,12 +40,8 @@
 
     .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
 
-    .active-tasks-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .section-title { font-size: 14px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
-    .tasks-scroll-container { flex-grow: 1; overflow-y: auto; padding-right: 6px; padding-bottom: 10px; }
-    .tasks-scroll-container::-webkit-scrollbar { width: 6px; }
-    .tasks-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
-    .tasks-scroll-container::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
+    .active-tasks-section { margin-top: 10px; display: flex; flex-direction: column; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
     
     .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
     .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -69,9 +65,6 @@
     .modal-close { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: var(--text-dim); font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s;}
     .modal-close:hover { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
     .modal-body { padding: 24px 30px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; flex-grow: 1; }
-    .modal-body::-webkit-scrollbar { width: 8px; }
-    .modal-body::-webkit-scrollbar-track { background: transparent; }
-    .modal-body::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
     
     .modal-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 3px solid var(--primary); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
     .modal-item-name { color: #f8fafc; font-weight: 600; margin-bottom: 8px; word-break: break-all; }
@@ -109,9 +102,10 @@
       <button class="btn-submit" onclick="startNewTask()">Bắt Đầu Sao Chép Nền</button>
     </div>
 
-    <div class="active-tasks-section" id="activeTasksSection" style="display:none;">
-      <div class="section-title" id="sectionTitle">Tiến trình đang chạy ngầm</div>
-      <div class="tasks-scroll-container" id="tasksListContainer"></div>
+    <!-- KHUNG HIỂN THỊ TIẾN TRÌNH LUÔN SẴN SÀNG -->
+    <div class="active-tasks-section" id="activeTasksSection">
+      <div class="section-title" id="sectionTitle">Tiến trình đang chạy ngầm (Đang tải...)</div>
+      <div id="tasksListContainer"></div>
     </div>
   </div>
 
@@ -169,10 +163,16 @@
       const callbackName = 'list_cb_' + Math.random().toString(36).substring(7);
       window[callbackName] = function(tasks) {
         delete window[callbackName];
+        
+        const container = document.getElementById('tasksListContainer');
+        const titleEl = document.getElementById('sectionTitle');
+
         if (!tasks || tasks.length === 0) {
-          document.getElementById('activeTasksSection').style.display = 'none';
+          titleEl.innerText = "Tiến trình đang chạy ngầm";
+          container.innerHTML = '<div style="color: var(--text-dim); font-size: 13px; padding: 10px 0;">✨ Hiện chưa có tiến trình nào đang chạy.</div>';
           return;
         }
+
         globalTasksData = tasks;
         let html = '';
         let activeCount = 0;
@@ -202,9 +202,8 @@
           `;
         });
 
-        document.getElementById('activeTasksSection').style.display = 'flex';
-        document.getElementById('sectionTitle').innerText = `Tiến trình đang chạy ngầm (${activeCount})`;
-        document.getElementById('tasksListContainer').innerHTML = html;
+        titleEl.innerText = `Tiến trình đang chạy ngầm (${activeCount})`;
+        container.innerHTML = html;
       };
 
       const script = document.createElement('script');
