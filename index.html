@@ -14,7 +14,7 @@
       background: #060913; 
       color: var(--text); 
       width: 100vw;
-      height: 100vh;
+      min-height: 100vh;
       overflow-x: hidden; 
     }
     
@@ -40,26 +40,38 @@
     .active-tasks-section { margin-top: 10px; padding-bottom: 30px; }
     .section-title { font-size: 13px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
     .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
     .task-name { font-size: 14px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; } 
-    .task-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); }
+    .task-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); white-space: nowrap; }
     
     .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
     .current-file-box span { color: #e2e8f0; font-weight: 600; }
 
-    .task-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px; color: var(--text-dim); background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; }
+    /* ĐÃ GOM THÀNH 1 HÀNG NGANG DUY NHẤT Ở ĐÂY */
+    .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 11.5px; color: var(--text-dim); background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; }
     .task-metrics span { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .metric-clickable { cursor: pointer; transition: 0.2s; padding: 2px; border-radius: 4px; }
+    .metric-clickable:hover { background: rgba(56, 189, 248, 0.15); color: var(--primary); }
 
-    .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; }
+    .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
+    .btn-kill:hover { background: rgba(239, 68, 68, 0.3); }
 
-    /* Khung iframe ẩn để lách CORS 100% triệt để */
     #hiddenFrame { display: none; }
+
+    #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #060913; z-index: 9999; padding: 0; margin: 0; }
+    .modal-content { background: #0d1321; border: none; border-radius: 0; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+    .modal-header { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; color: var(--primary); }
+    .modal-close { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: var(--text-dim); font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; }
+    .modal-body { padding: 20px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; flex-grow: 1; }
+    .modal-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 3px solid var(--primary); border-radius: 6px; padding: 12px; margin-bottom: 10px; word-break: break-all; }
+    .modal-item-name { color: #f8fafc; font-weight: 600; margin-bottom: 4px; }
+    .modal-item-desc { color: var(--text-dim); font-size: 11px; }
+    .empty-msg { text-align: center; color: var(--text-dim); padding: 40px; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- MÀN HÌNH KHÓA PIN -->
   <div id="pinScreen">
     <div class="pin-box">
       <div style="font-size: 32px; margin-bottom: 12px;">🛡️</div>
@@ -69,7 +81,6 @@
     </div>
   </div>
 
-  <!-- GIAO DIỆN CHÍNH -->
   <div class="container" id="mainApp" style="display: none;">
     <div class="app-header">
       <div class="app-title">⚡ Drive Cloud Cloner</div>
@@ -89,11 +100,17 @@
 
     <div class="active-tasks-section">
       <div class="section-title" id="sectionTitle">Tiến trình đang chạy ngầm</div>
-      <div id="tasksListContainer"><div style="color: var(--text-dim); font-size: 13px;">Đang đồng bộ hệ thống...</div></div>
+      <div id="tasksListContainer"></div>
     </div>
   </div>
 
-  <!-- Iframe ngầm để nhận/gửi dữ liệu trực tiếp với GAS không bị chặn -->
+  <div id="infoModal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header" id="modalTitle">Chi tiết thông tin</div>
+      <div class="modal-body" id="modalListContainer"></div>
+    </div>
+  </div>
+
   <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
 
   <script>
@@ -106,7 +123,7 @@
         document.getElementById('pinScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         loadTasksStatus();
-        setInterval(loadTasksStatus, 5000);
+        setInterval(loadTasksStatus, 4000);
       } else {
         alert('Mã PIN không đúng!');
       }
@@ -117,26 +134,14 @@
       const dst = document.getElementById('dstUrl').value.trim();
       if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
 
-      // Tạo form ảo submit ngầm qua iframe để tuyệt đối không bị lỗi CORS trên mobile và PC
       const form = document.createElement('form');
       form.method = 'GET';
       form.action = GAS_URL;
       form.target = 'hiddenFrame';
 
-      const actionInput = document.createElement('input');
-      actionInput.name = 'action';
-      actionInput.value = 'create';
-      form.appendChild(actionInput);
-
-      const srcInput = document.createElement('input');
-      srcInput.name = 'src';
-      srcInput.value = src;
-      form.appendChild(srcInput);
-
-      const dstInput = document.createElement('input');
-      dstInput.name = 'dst';
-      dstInput.value = dst;
-      form.appendChild(dstInput);
+      const act = document.createElement('input'); act.name = 'action'; act.value = 'create'; form.appendChild(act);
+      const s = document.createElement('input'); s.name = 'src'; s.value = src; form.appendChild(s);
+      const d = document.createElement('input'); d.name = 'dst'; d.value = dst; form.appendChild(d);
 
       document.body.appendChild(form);
       form.submit();
@@ -144,12 +149,12 @@
 
       document.getElementById('srcUrl').value = '';
       document.getElementById('dstUrl').value = '';
-      alert('Đã gửi lệnh tạo tiến trình! Đang khởi chạy...');
-      setTimeout(loadTasksStatus, 2000);
+      setTimeout(loadTasksStatus, 1500);
     }
 
+    let globalTasksData = [];
+
     function loadTasksStatus() {
-      // Dùng JSONP qua thẻ script để lấy danh sách tiến trình về vẽ lên màn hình
       const cb = 'jsonp_' + Math.random().toString(36).substring(7);
       window[cb] = function(tasks) {
         delete window[cb];
@@ -158,10 +163,11 @@
 
         if (!tasks || tasks.length === 0) {
           titleEl.innerText = "Tiến trình đang chạy ngầm";
-          container.innerHTML = '<div style="color: var(--text-dim); font-size: 13px;">✨ Hiện chưa có tiến trình nào đang chạy.</div>';
+          container.innerHTML = '<div style="color: var(--text-dim); font-size: 12.5px;">✨ Hiện chưa có tiến trình nào đang chạy.</div>';
           return;
         }
 
+        globalTasksData = tasks;
         let html = '';
         tasks.forEach(t => {
           let displayName = t.taskName ? t.taskName : ('Task: ' + t.id);
@@ -175,10 +181,10 @@
                 Đang xử lý: <span>${t.lastFile || 'Đang kết nối...'}</span>
               </div>
               <div class="task-metrics">
-                <div>Quét: <span>${t.totalScanned}</span></div>
-                <div>Thành công: <span>${t.copiedFiles}</span></div>
-                <div>Chờ 24h: <span>${t.queuedFiles}</span></div>
-                <div>Bỏ qua: <span>${t.skippedFiles}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'scanned')">Quét: <span>${t.totalScanned}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'copied')">Thành công: <span>${t.copiedFiles}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'queued')">Chờ 24h: <span>${t.queuedFiles}</span></div>
+                <div class="metric-clickable" onclick="openDetailModal('${t.id}', 'skipped')">Bỏ qua: <span>${t.skippedFiles}</span></div>
               </div>
               <button class="btn-kill" onclick="killTask('${t.id}')">Dừng tiến trình</button>
             </div>
@@ -209,6 +215,40 @@
       form.remove();
       setTimeout(loadTasksStatus, 1000);
     }
+
+    function openDetailModal(taskId, type) {
+      const task = globalTasksData.find(t => t.id === taskId);
+      if (!task) return;
+      let title = "Chi tiết tiến trình";
+      let listData = [];
+
+      if (type === 'scanned') { title = "📂 Tệp đã quét"; listData = task.scannedList || []; }
+      else if (type === 'copied') { title = "✅ Thành công"; listData = task.copiedList || []; }
+      else if (type === 'queued') { title = "⏳ Chờ 24h"; listData = task.retryQueue || []; }
+      else if (type === 'skipped') { title = "🚫 Bỏ qua"; listData = task.skippedList || []; }
+
+      document.getElementById('modalTitle').innerHTML = `<span>${title}</span><button class="modal-close" onclick="closeModal()">Đóng lại ✕</button>`;
+      
+      let listHtml = '';
+      if (listData.length === 0) {
+        listHtml = '<div class="empty-msg">✨ Chưa có dữ liệu.</div>';
+      } else {
+        listData.forEach(item => {
+          let name = item.name || item.fileName || "Tệp ẩn danh";
+          let desc = item.reason || 'Đang xử lý';
+          listHtml += `
+            <div class="modal-item">
+              <div class="modal-item-name">📄 ${name}</div>
+              <div class="modal-item-desc">Trạng thái: ${desc}</div>
+            </div>
+          `;
+        });
+      }
+      document.getElementById('modalListContainer').innerHTML = listHtml;
+      document.getElementById('infoModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
   </script>
 </body>
 </html>
