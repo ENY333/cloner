@@ -8,55 +8,41 @@
   <style>
     :root { --primary: #38bdf8; --card-border: rgba(255, 255, 255, 0.08); --card-bg: rgba(13, 19, 33, 0.95); --text: #f8fafc; --text-dim: #94a3b8; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    html, body { 
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
-      background: #060913; 
-      color: var(--text); 
-      width: 100vw;
-      min-height: 100vh;
-      overflow-x: hidden; 
-    }
-    
+    html, body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #060913; color: var(--text); width: 100vw; min-height: 100vh; overflow-x: hidden; }
     #pinScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #060913; z-index: 10000; display: flex; justify-content: center; align-items: center; }
     .pin-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 320px; max-width: 90%; }
     #pinInput { width: 100%; padding: 14px; margin-bottom: 16px; background: rgba(8, 12, 22, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; text-align: center; letter-spacing: 4px; font-size: 16px; outline: none; }
     #pinInput:focus { border-color: var(--primary); }
-
     .btn-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; }
     .btn-submit:hover { box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); }
-
+    .btn-submit:disabled { opacity: .65; cursor: wait; }
     .container { width: 100%; min-height: 100vh; padding: 25px 4%; display: flex; flex-direction: column; }
     .app-header { display: flex; align-items: center; margin-bottom: 20px; }
     .app-title { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--primary); }
-    
     .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
-    
     input[type="text"] { width: 100%; padding: 14px 16px; background: rgba(8, 12, 22, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
     input[type="text"]:focus { border-color: var(--primary); }
-
     .active-tasks-section { margin-top: 10px; padding-bottom: 30px; }
     .section-title { font-size: 13px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    
     .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
     .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .task-name { font-size: 14px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; } 
+    .task-name { font-size: 14px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
     .task-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); white-space: nowrap; }
-    
     .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
     .current-file-box span { color: #e2e8f0; font-weight: 600; }
-
+    .progress-wrap { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.05); border-radius: 8px; padding: 9px 10px; }
+    .progress-label { display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
+    .progress-track { width:100%; height:7px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
+    .progress-bar { height:100%; border-radius:99px; background:linear-gradient(90deg,#0284c7,#38bdf8); transition:width .35s ease; }
     .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .metric-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); padding: 10px 6px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
     .metric-box:hover { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); }
     .metric-label { font-size: 10.5px; color: var(--text-dim); margin-bottom: 4px; font-weight: 600; }
     .metric-value { font-size: 13px; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-
     .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
     .btn-kill:hover { background: rgba(239, 68, 68, 0.3); }
-
     #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #060913; z-index: 9999; padding: 0; margin: 0; }
     .modal-content { background: #0d1321; border: none; border-radius: 0; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
     .modal-header { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; color: var(--primary); }
@@ -66,10 +52,14 @@
     .modal-item-name { color: #f8fafc; font-weight: 600; margin-bottom: 4px; }
     .modal-item-desc { color: var(--text-dim); font-size: 11px; }
     .empty-msg { text-align: center; color: var(--text-dim); padding: 40px; font-size: 13px; }
+    .api-status { font-size:11px; margin-left:auto; color:var(--text-dim); }
+    .api-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#64748b; margin-right:5px; }
+    .api-dot.online { background:#22c55e; }
+    .api-dot.offline { background:#ef4444; }
+    @media (max-width: 600px) { .task-metrics { grid-template-columns: repeat(2, 1fr); } .app-header { align-items:flex-start; } .api-status { margin-top:5px; } }
   </style>
 </head>
 <body>
-
   <div id="pinScreen">
     <div class="pin-box">
       <div style="font-size: 32px; margin-bottom: 12px;">🛡️</div>
@@ -78,12 +68,11 @@
       <button id="btnUnlock" class="btn-submit" onclick="checkPin()">Mở Khóa</button>
     </div>
   </div>
-
   <div class="container" id="mainApp" style="display: none;">
     <div class="app-header">
       <div class="app-title">⚡ Drive Cloud Cloner</div>
+      <div class="api-status" id="apiStatus"><span class="api-dot" id="apiDot"></span><span id="apiStatusText">Đang kiểm tra...</span></div>
     </div>
-
     <div class="form-box">
       <div class="form-group">
         <label>Link thư mục nguồn:</label>
@@ -93,9 +82,8 @@
         <label>Link thư mục đích:</label>
         <input type="text" id="dstUrl" placeholder="https://drive.google.com/drive/folders/...">
       </div>
-      <button class="btn-submit" onclick="startNewTask()">Bắt Đầu Sao Chép Nền</button>
+      <button id="btnStart" class="btn-submit" onclick="startNewTask()">Bắt Đầu Sao Chép Nền</button>
     </div>
-
     <div class="active-tasks-section">
       <div class="section-title" id="sectionTitle">Tiến trình đang chạy ngầm</div>
       <div id="tasksListContainer"></div>
@@ -108,10 +96,18 @@
       <div class="modal-body" id="modalListContainer"></div>
     </div>
   </div>
-
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
     const CORRECT_PIN = "5450";
+    let globalTasksData = [];
+    let pollingStarted = false;
+    let requestBusy = false;
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>'"]/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];
+      });
+    }
 
     function checkPin() {
       const pin = document.getElementById('pinInput').value;
@@ -119,141 +115,165 @@
         document.getElementById('pinScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         loadTasksStatus();
-        setInterval(loadTasksStatus, 8000);
+        checkApiHealth();
+        if (!pollingStarted) {
+          pollingStarted = true;
+          setInterval(loadTasksStatus, 8000);
+        }
       } else {
         alert('Mã PIN không đúng!');
       }
     }
 
+    function jsonpRequest(action, params, callback, timeoutMs) {
+      const cb = 'cb_' + action + '_' + Math.random().toString(36).substring(2, 10);
+      const script = document.createElement('script');
+      let finished = false;
+      const query = Object.keys(params || {}).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
+      const finish = function() {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        try { delete window[cb]; } catch(e) {}
+        if (script.parentNode) script.parentNode.removeChild(script);
+      };
+      window[cb] = function(res) { finish(); callback(null, res); };
+      script.onerror = function() { finish(); callback(new Error('Không thể kết nối Google Apps Script.'), null); };
+      script.src = GAS_URL + '?action=' + encodeURIComponent(action) + (query ? '&' + query : '') + '&callback=' + cb;
+      document.body.appendChild(script);
+      const timer = setTimeout(function() {
+        if (finished) return;
+        finish();
+        callback(new Error('Máy chủ phản hồi quá lâu. Task có thể vẫn đang được tạo/chạy nền.'), null);
+      }, timeoutMs || 30000);
+    }
+
+    function checkApiHealth() {
+      jsonpRequest('health', {}, function(err, res) {
+        const dot = document.getElementById('apiDot');
+        const text = document.getElementById('apiStatusText');
+        if (!dot || !text) return;
+        if (!err && res && res.success) {
+          dot.className = 'api-dot online';
+          text.innerText = 'Backend online';
+        } else {
+          dot.className = 'api-dot offline';
+          text.innerText = 'Backend lỗi';
+        }
+      }, 10000);
+    }
+
     function startNewTask() {
+      if (requestBusy) return alert('Đang gửi yêu cầu, vui lòng chờ...');
       const src = document.getElementById('srcUrl').value.trim();
       const dst = document.getElementById('dstUrl').value.trim();
       if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
+      if (src === dst) return alert('Link nguồn và link đích không được giống nhau!');
 
-      const cb = 'create_cb_' + Math.random().toString(36).substring(7);
-      window[cb] = function(res) {
-        delete window[cb];
+      const btn = document.getElementById('btnStart');
+      requestBusy = true;
+      btn.disabled = true;
+      btn.innerText = 'Đang khởi tạo...';
+
+      jsonpRequest('create', {src: src, dst: dst}, function(err, res) {
+        requestBusy = false;
+        btn.disabled = false;
+        btn.innerText = 'Bắt Đầu Sao Chép Nền';
+        if (err) {
+          alert(err.message);
+          loadTasksStatus();
+          return;
+        }
         if (res && res.success) {
           document.getElementById('srcUrl').value = '';
           document.getElementById('dstUrl').value = '';
           loadTasksStatus();
         } else {
-          alert('Lỗi tạo tiến trình: ' + (res ? res.error : 'Không rõ nguyên nhân'));
+          alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ nguyên nhân') : 'Không rõ nguyên nhân'));
         }
-      };
-
-      const s = document.createElement('script');
-      s.src = GAS_URL + "?action=create&src=" + encodeURIComponent(src) + "&dst=" + encodeURIComponent(dst) + "&callback=" + cb;
-      document.body.appendChild(s);
-      setTimeout(() => s.remove(), 5000);
+      }, 40000);
     }
 
-    let globalTasksData = [];
-
     function loadTasksStatus() {
-      const cb = 'jsonp_' + Math.random().toString(36).substring(7);
-      window[cb] = function(tasks) {
-        delete window[cb];
+      jsonpRequest('list', {}, function(err, tasks) {
         const container = document.getElementById('tasksListContainer');
         const titleEl = document.getElementById('sectionTitle');
-
-        if (!tasks || tasks.length === 0) {
-          titleEl.innerText = "Tiến trình đang chạy ngầm";
-          container.innerHTML = '<div style="color: var(--text-dim); font-size: 12.5px;">✨ Hiện chưa có tiến trình nào đang chạy.</div>';
+        if (!container || !titleEl) return;
+        if (err) {
+          container.innerHTML = '<div style="color:#fca5a5;font-size:12.5px;">⚠️ Không lấy được trạng thái: ' + escapeHtml(err.message) + '</div>';
           return;
         }
-
+        if (!Array.isArray(tasks) || tasks.length === 0) {
+          titleEl.innerText = 'Tiến trình đang chạy ngầm';
+          container.innerHTML = '<div style="color: var(--text-dim); font-size: 12.5px;">✨ Hiện chưa có tiến trình nào đang chạy.</div>';
+          globalTasksData = [];
+          return;
+        }
         globalTasksData = tasks;
         let html = '';
         tasks.forEach(t => {
-          let displayName = t.taskName ? t.taskName : ('Task: ' + t.id);
+          const id = escapeHtml(t.id || '');
+          const displayName = escapeHtml(t.taskName ? t.taskName : ('Task: ' + (t.id || '')));
+          const status = escapeHtml(t.statusMsg || 'Đang xử lý');
+          const lastFile = escapeHtml(t.lastFile || 'Đang kết nối...');
+          const pct = Math.max(0, Math.min(100, Number(t.progressPercent) || 0));
           html += `
             <div class="task-item-card">
               <div class="task-top">
                 <div class="task-name">📂 ${displayName}</div>
-                <div class="task-status">${t.statusMsg}</div>
+                <div class="task-status">${status}</div>
               </div>
-              <div class="current-file-box">
-                Đang xử lý: <span>${t.lastFile || 'Đang kết nối...'}</span>
+              <div class="current-file-box">Đang xử lý: <span>${lastFile}</span></div>
+              <div class="progress-wrap">
+                <div class="progress-label"><span>Tiến độ</span><span>${pct}%</span></div>
+                <div class="progress-track"><div class="progress-bar" style="width:${pct}%"></div></div>
               </div>
               <div class="task-metrics">
-                <div class="metric-box" onclick="openDetailModal('${t.id}', 'scanned')">
-                  <div class="metric-label">Quét</div>
-                  <div class="metric-value">${t.totalScanned}</div>
-                </div>
-                <div class="metric-box" onclick="openDetailModal('${t.id}', 'copied')">
-                  <div class="metric-label">Thành công</div>
-                  <div class="metric-value">${t.copiedFiles}</div>
-                </div>
-                <div class="metric-box" onclick="openDetailModal('${t.id}', 'queued')">
-                  <div class="metric-label">Chờ 24h</div>
-                  <div class="metric-value">${t.queuedFiles}</div>
-                </div>
-                <div class="metric-box" onclick="openDetailModal('${t.id}', 'skipped')">
-                  <div class="metric-label">Bỏ qua</div>
-                  <div class="metric-value">${t.skippedFiles}</div>
-                </div>
+                <div class="metric-box" onclick="openDetailModal('${id}', 'scanned')"><div class="metric-label">Quét</div><div class="metric-value">${Number(t.totalScanned)||0}</div></div>
+                <div class="metric-box" onclick="openDetailModal('${id}', 'copied')"><div class="metric-label">Thành công</div><div class="metric-value">${Number(t.copiedFiles)||0}</div></div>
+                <div class="metric-box" onclick="openDetailModal('${id}', 'queued')"><div class="metric-label">Chờ 24h</div><div class="metric-value">${Number(t.queuedFiles)||0}</div></div>
+                <div class="metric-box" onclick="openDetailModal('${id}', 'skipped')"><div class="metric-label">Bỏ qua</div><div class="metric-value">${Number(t.skippedFiles)||0}</div></div>
               </div>
-              <button class="btn-kill" onclick="killTask('${t.id}')">Dừng tiến trình</button>
-            </div>
-          `;
+              <button class="btn-kill" onclick="killTask('${id}')">Dừng tiến trình</button>
+            </div>`;
         });
-
         titleEl.innerText = `Tiến trình đang chạy ngầm (${tasks.length})`;
         container.innerHTML = html;
-      };
-
-      const s = document.createElement('script');
-      s.src = GAS_URL + "?action=list&callback=" + cb;
-      document.body.appendChild(s);
-      setTimeout(() => s.remove(), 5000);
+      }, 15000);
     }
 
     function killTask(taskId) {
-      const cb = 'kill_cb_' + Math.random().toString(36).substring(7);
-      window[cb] = function() {
-        delete window[cb];
+      if (!confirm('Bạn có chắc muốn dừng tiến trình này?')) return;
+      jsonpRequest('kill', {id: taskId}, function(err, res) {
+        if (err) return alert(err.message);
+        if (!res || !res.success) return alert('Không thể dừng tiến trình.');
         loadTasksStatus();
-      };
-
-      const s = document.createElement('script');
-      s.src = GAS_URL + "?action=kill&id=" + taskId + "&callback=" + cb;
-      document.body.appendChild(s);
-      setTimeout(() => s.remove(), 5000);
+      }, 15000);
     }
 
     function openDetailModal(taskId, type) {
       const task = globalTasksData.find(t => t.id === taskId);
       if (!task) return;
-      let title = "Chi tiết tiến trình";
+      let title = 'Chi tiết tiến trình';
       let listData = [];
-
-      if (type === 'scanned') { title = "📂 Tệp đã quét"; listData = task.scannedList || []; }
-      else if (type === 'copied') { title = "✅ Thành công"; listData = task.copiedList || []; }
-      else if (type === 'queued') { title = "⏳ Chờ 24h"; listData = task.retryQueue || []; }
-      else if (type === 'skipped') { title = "🚫 Bỏ qua"; listData = task.skippedList || []; }
-
-      document.getElementById('modalTitle').innerHTML = `<span>${title}</span><button class="modal-close" onclick="closeModal()">Đóng lại ✕</button>`;
-      
+      if (type === 'scanned') { title = '📂 Tệp đã quét'; listData = task.scannedList || []; }
+      else if (type === 'copied') { title = '✅ Thành công'; listData = task.copiedList || []; }
+      else if (type === 'queued') { title = '⏳ Chờ 24h'; listData = task.retryQueue || []; }
+      else if (type === 'skipped') { title = '🚫 Bỏ qua'; listData = task.skippedList || []; }
+      document.getElementById('modalTitle').innerHTML = `<span>${escapeHtml(title)}</span><button class="modal-close" onclick="closeModal()">Đóng lại ✕</button>`;
       let listHtml = '';
       if (listData.length === 0) {
         listHtml = '<div class="empty-msg">✨ Chưa có dữ liệu.</div>';
       } else {
         listData.forEach(item => {
-          let name = item.name || item.fileName || "Tệp ẩn danh";
-          let desc = item.reason || 'Đang xử lý';
-          listHtml += `
-            <div class="modal-item">
-              <div class="modal-item-name">📄 ${name}</div>
-              <div class="modal-item-desc">Trạng thái: ${desc}</div>
-            </div>
-          `;
+          const name = escapeHtml(item.name || item.fileName || 'Tệp ẩn danh');
+          const desc = escapeHtml(item.reason || 'Đang xử lý');
+          listHtml += `<div class="modal-item"><div class="modal-item-name">📄 ${name}</div><div class="modal-item-desc">Trạng thái: ${desc}</div></div>`;
         });
       }
       document.getElementById('modalListContainer').innerHTML = listHtml;
       document.getElementById('infoModal').style.display = 'flex';
     }
-
     function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
   </script>
 </body>
