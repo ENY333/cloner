@@ -100,15 +100,15 @@
     
     <div class="form-box">
       <div class="form-group">
-        <label>Link thư mục nguồn:</label>
-        <input type="text" id="srcUrl" placeholder="https://drive.google.com/drive/folders/...">
+        <label>Link Thư mục / Tệp nguồn (Hỗ trợ mọi định dạng):</label>
+        <input type="text" id="srcUrl" placeholder="https://drive.google.com/drive/folders/... hoặc /file/d/...">
       </div>
       <div class="form-group">
-        <label>Link thư mục đích:</label>
+        <label>Link Thư mục đích:</label>
         <input type="text" id="dstUrl" placeholder="https://drive.google.com/drive/folders/...">
       </div>
       <button id="btnStart" class="btn-submit" onclick="startNewTask()">🚀 Bắt Đầu Sao Chép Nền</button>
-      <div class="form-help">ⓘ Chỉ hỗ trợ sao chép thư mục. Tài khoản chạy Google Apps Script phải có quyền xem thư mục nguồn và quyền chỉnh sửa thư mục đích.</div>
+      <div class="form-help">ⓘ Hỗ trợ sao chép toàn bộ thư mục hoặc các tệp tin lẻ (.7z, .mp4, .zip...). Tài khoản chạy Apps Script phải có quyền xem nguồn và chỉnh sửa đích.</div>
     </div>
     
     <div class="active-tasks-section">
@@ -150,7 +150,6 @@
         loadTasksStatus();
         checkApiHealth();
         
-        // Chạy nền tự động làm mới mỗi 8 giây (im lặng)
         if (!pollingStarted) {
           pollingStarted = true;
           setInterval(loadTasksStatus, 8000);
@@ -272,7 +271,7 @@
           html += `
             <div class="task-item-card">
               <div class="task-top">
-                <div class="task-name">📂 ${displayName}</div>
+                <div class="task-name">${displayName}</div>
                 <div class="task-status">${status}</div>
               </div>
               <div class="current-file-box">Đang xử lý: <span>${lastFile}</span></div>
