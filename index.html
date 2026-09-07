@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drive Cloud Cloner</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='rgba(56,189,248,0.2)' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z'/><polygon fill='%230ea5e9' points='13 2 9 13 12 13 11 22 15 11 12 11 13 2'/></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
     :root { --primary: #38bdf8; --card-border: rgba(255, 255, 255, 0.08); --card-bg: rgba(13, 19, 33, 0.95); --text: #f8fafc; --text-dim: #94a3b8; }
@@ -34,7 +35,7 @@
     .empty-subtitle { color:var(--text-dim); font-size:13px; line-height:1.5; }
     .footer-note { text-align:center; color:var(--text-dim); font-size:12px; margin:26px 0 8px; }
     .app-title { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--primary); }
-    .app-title svg { filter: drop-shadow(0px 2px 6px rgba(56, 189, 248, 0.4)); }
+    .app-title svg { filter: drop-shadow(0px 2px 6px rgba(56, 189, 248, 0.4)); margin-right: 4px; }
     .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
@@ -149,6 +150,7 @@
         loadTasksStatus();
         checkApiHealth();
         
+        // Chạy nền tự động làm mới mỗi 8 giây (im lặng)
         if (!pollingStarted) {
           pollingStarted = true;
           setInterval(loadTasksStatus, 8000);
