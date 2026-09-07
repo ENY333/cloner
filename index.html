@@ -34,6 +34,7 @@
     .empty-subtitle { color:var(--text-dim); font-size:13px; line-height:1.5; }
     .footer-note { text-align:center; color:var(--text-dim); font-size:12px; margin:26px 0 8px; }
     .app-title { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--primary); }
+    .app-title svg { filter: drop-shadow(0px 2px 6px rgba(56, 189, 248, 0.4)); }
     .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
@@ -83,20 +84,19 @@
       <button id="btnUnlock" class="btn-submit" onclick="checkPin()">Mở Khóa</button>
     </div>
   </div>
+  
   <div class="container" id="mainApp" style="display: none;">
     <div class="app-header">
-      
-    <div class="app-title">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" style="filter: drop-shadow(0px 2px 6px rgba(56, 189, 248, 0.4));">
-    <!-- Nền đám mây -->
-    <path fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
-    <!-- Tia chớp -->
-    <polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"></polygon>
-  </svg>
-  Drive Cloud Cloner
-</div>
+      <div class="app-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
+          <path fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+          <polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"></polygon>
+        </svg>
+        Drive Cloud Cloner
+      </div>
       <div class="backend-badge" id="apiStatus"><span class="api-dot" id="apiDot"></span><span id="apiStatusText">Đang kiểm tra...</span></div>
     </div>
+    
     <div class="form-box">
       <div class="form-group">
         <label>Link thư mục nguồn:</label>
@@ -109,11 +109,11 @@
       <button id="btnStart" class="btn-submit" onclick="startNewTask()">🚀 Bắt Đầu Sao Chép Nền</button>
       <div class="form-help">ⓘ Chỉ hỗ trợ sao chép thư mục. Tài khoản chạy Google Apps Script phải có quyền xem thư mục nguồn và quyền chỉnh sửa thư mục đích.</div>
     </div>
+    
     <div class="active-tasks-section">
       <div class="task-toolbar">
         <div class="section-title" id="sectionTitle" style="margin:0">TIẾN TRÌNH ĐANG CHẠY NGẦM</div>
         <div class="toolbar-spacer"></div>
-        <!-- Nút Làm Mới thủ công -->
         <button class="btn-secondary" onclick="loadTasksStatus()">↻ Làm mới</button>
       </div>
       <div id="tasksListContainer"></div>
@@ -149,7 +149,6 @@
         loadTasksStatus();
         checkApiHealth();
         
-        // Âm thầm chạy cập nhật ngầm mỗi 8 giây
         if (!pollingStarted) {
           pollingStarted = true;
           setInterval(loadTasksStatus, 8000);
