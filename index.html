@@ -205,14 +205,14 @@
         return;
       }
       dropdown.style.display = 'block';
-      dropdown.innerHTML = '<div style="padding:12px; color:#38bdf8; font-size:12.5px; text-align:center;">🔄 Đang đồng bộ thư mục mới nhất từ Drive...</div>';
+      dropdown.innerHTML = '<div style="padding:12px; color:#38bdf8; font-size:12.5px; text-align:center;">🔄 Đang tải thư mục từ "My Drive"...</div>';
 
       jsonpRequest('getFolders', {}, function(err, res) {
         if (err || !res.success) {
           dropdown.innerHTML = '<div style="padding:10px; color:#fca5a5; font-size:12px; text-align:center;">⚠️ Không thể đồng bộ: ' + escapeHtml(err ? err.message : res.error) + '</div>';
           return;
         }
-        let html = '<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:6px;"><span style="font-size:11px; color:#94a3b8; font-weight:700;">THƯ MỤC GẦN ĐÂY</span><span style="font-size:11px; color:#38bdf8; cursor:pointer;" onclick="openFolderPicker()">↻ Tải lại</span></div>';
+        let html = '<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:6px;"><span style="font-size:11px; color:#94a3b8; font-weight:700;">THƯ MỤC TRONG MY DRIVE </span><span style="font-size:11px; color:#38bdf8; cursor:pointer;" onclick="openFolderPicker()">↻ Tải lại</span></div>';
         
         if (!res.folders || res.folders.length === 0) {
           html += '<div style="padding:10px; color:#94a3b8; font-size:12px; text-align:center;">Không tìm thấy thư mục nào.</div>';
