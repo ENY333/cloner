@@ -41,8 +41,11 @@
     .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .form-group { margin-bottom: 14px; position: relative;}
     label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
-    input[type="text"] { width: 100%; padding: 14px 16px; background: rgba(8, 12, 22, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
-    input[type="text"]:focus { border-color: var(--primary); }
+    
+    /* Chuyển ô nhập thành hộp to cho phép dán nguyên đoạn Zalo vào */
+    input[type="text"], textarea { width: 100%; padding: 14px 16px; background: rgba(8, 12, 22, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: inherit; }
+    input[type="text"]:focus, textarea:focus { border-color: var(--primary); }
+    textarea { resize: vertical; min-height: 80px; }
     
     .folder-item-wrap { display:flex; justify-content:space-between; align-items:center; border-radius: 6px; transition: 0.2s; padding: 2px; }
     .folder-item-wrap:hover { background: rgba(56, 189, 248, 0.1); }
@@ -85,7 +88,6 @@
     .api-dot.online { background:#22c55e; }
     .api-dot.offline { background:#ef4444; }
 
-    /* CSS Giao diện đo dung lượng Drive */
     .storage-box { display:none; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 14px; margin-top: 14px; }
     .storage-header { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; }
     .storage-value { color: #fff; font-family: 'JetBrains Mono', monospace; }
@@ -110,8 +112,8 @@
     
     <div class="form-box">
       <div class="form-group">
-        <label>Link Thư mục / Tệp nguồn (Hỗ trợ mọi định dạng):</label>
-        <input type="text" id="srcUrl" placeholder="https://drive.google.com/drive/folders/... hoặc /file/d/...">
+        <label>Đoạn văn chứa link Nguồn (Tự động lọc nhiều link cùng lúc):</label>
+        <textarea id="srcUrl" placeholder="Dán 1 link hoặc nguyên đoạn văn chứa nhiều link Drive vào đây..."></textarea>
       </div>
       
       <div class="form-group" style="position: relative;">
@@ -126,7 +128,6 @@
       
       <button id="btnStart" class="btn-submit" onclick="startNewTask()">🚀 Bắt Đầu Sao Chép Nền</button>
 
-      <!-- Khối hiển thị dung lượng Drive -->
       <div class="storage-box" id="storageBox">
         <div class="storage-header">
           <span>☁️ Dung lượng Google Drive</span>
@@ -135,7 +136,7 @@
         <div class="progress-track" style="height: 6px;"><div class="progress-bar" id="storageBar" style="width: 0%; background: #38bdf8;"></div></div>
       </div>
       
-      <div class="form-help" style="margin-top: 14px;">ⓘ Hỗ trợ sao chép toàn bộ thư mục hoặc tệp lẻ. Tài khoản chạy Apps Script phải có quyền xem nguồn và chỉnh sửa đích.</div>
+      <div class="form-help" style="margin-top: 14px;">ⓘ Hỗ trợ sao chép nhiều thư mục, tệp lẻ cùng lúc. Bạn có thể paste nguyên tin nhắn Zalo vào ô trên.</div>
     </div>
     
     <div class="active-tasks-section">
@@ -156,6 +157,7 @@
   </div>
   
   <script>
+    // ⚠️⚠️ BẠN BẮT BUỘC PHẢI THAY LINK APPS SCRIPT CỦA BẠN VÀO ĐÂY:
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
     
     let globalTasksData = [];
@@ -167,7 +169,6 @@
     let currentFolderName = 'My Drive';
 
     window.onload = function() {
-        // TÍNH NĂNG MỚI: TỰ ĐỘNG BẮT LINK TỪ EXTENSION TRUYỀN VÀO
         const urlParams = new URLSearchParams(window.location.search);
         const autoSrc = urlParams.get('autoSrc');
         if (autoSrc) {
@@ -333,35 +334,42 @@
       }
     });
 
+    // MÁY LỌC LINK TỰ ĐỘNG
     function startNewTask() {
       if (requestBusy) return alert('Đang gửi yêu cầu, vui lòng chờ...');
-      const src = document.getElementById('srcUrl').value.trim();
+      const srcText = document.getElementById('srcUrl').value.trim();
       const dst = document.getElementById('dstUrl').value.trim();
-      if (!src || !dst) return alert('Vui lòng điền đủ 2 link!');
-      if (src === dst) return alert('Link nguồn và link đích không được giống nhau!');
+      
+      if (!srcText || !dst) return alert('Vui lòng điền đủ 2 trường dữ liệu!');
+
+      // Dùng Regex tìm tất cả các link chứa drive.google.com nằm trong đoạn văn
+      const regex = /(https:\/\/drive\.google\.com\/[^\s'"]+)/g;
+      let matchedLinks = srcText.match(regex) || [];
+      
+      // Loại bỏ các link bị trùng lặp
+      let uniqueLinks = [...new Set(matchedLinks)];
+
+      // Nếu Regex không bắt được (do người dùng chỉ dán mỗi cái ID), lấy nguyên cái text đó làm fallback
+      if (uniqueLinks.length === 0) {
+        uniqueLinks = [srcText];
+      }
 
       const btn = document.getElementById('btnStart');
       requestBusy = true;
       btn.disabled = true;
-      btn.innerText = 'Đang khởi tạo...';
+      btn.innerText = `Đang khởi tạo ${uniqueLinks.length} tiến trình...`;
 
-      jsonpRequest('diagnose', {src: src, dst: dst}, function(diagErr, diag) {
-        if (diagErr) {
+      // Kiểm tra quyền 1 link đại diện để xem có chết không
+      jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
+        if (diagErr || !diag || !diag.success) {
           requestBusy = false;
           btn.disabled = false;
           btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
-          return alert('Không kiểm tra được quyền Drive: ' + diagErr.message);
-        }
-        if (!diag || !diag.success) {
-          requestBusy = false;
-          btn.disabled = false;
-          btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
-          const se = diag && diag.source ? diag.source.error : 'Không rõ';
-          const de = diag && diag.destination ? diag.destination.error : 'Không rõ';
-          return alert('Không đủ quyền Google Drive.\n\nNguồn: ' + (diag && diag.source && diag.source.ok ? 'OK' : se) + '\nĐích: ' + (diag && diag.destination && diag.destination.ok ? 'OK' : de) + '\n\nHãy cấp quyền cho tài khoản chạy Apps Script.');
+          return alert('Không đủ quyền truy cập (hoặc link nguồn đầu tiên bị lỗi)!');
         }
 
-        jsonpRequest('create', {src: src, dst: dst}, function(err, res) {
+        // Nếu quyền OK, gửi toàn bộ danh sách link lên server
+        jsonpRequest('create_batch', {srcList: JSON.stringify(uniqueLinks), dst: dst}, function(err, res) {
           requestBusy = false;
           btn.disabled = false;
           btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
@@ -374,11 +382,12 @@
             document.getElementById('srcUrl').value = '';
             document.getElementById('dstUrl').value = '';
             loadTasksStatus();
-            checkStorage(); // Cập nhật dung lượng sau khi tạo task
+            checkStorage(); 
+            alert(`Đã đưa thành công ${res.count} link vào hàng đợi chạy ngầm!`);
           } else {
-            alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ nguyên nhân') : 'Không rõ nguyên nhân'));
+            alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ') : 'Không rõ'));
           }
-        }, 40000);
+        }, 60000); // Tăng timeout lên 60s để phòng trường hợp dán hàng chục link
       }, 15000);
     }
 
@@ -398,7 +407,7 @@
         
         if (!Array.isArray(tasks) || tasks.length === 0) {
           titleEl.innerText = 'Tiến trình đang chạy ngầm';
-          container.innerHTML = '<div class="empty-card"><div class="empty-icon">📁</div><div class="empty-title">Hiện chưa có tiến trình nào đang chạy.</div><div class="empty-subtitle">Nhập link nguồn và đích ở trên và bấm “Bắt Đầu Sao Chép Nền” để tạo tiến trình mới.</div></div>';
+          container.innerHTML = '<div class="empty-card"><div class="empty-icon">📁</div><div class="empty-title">Hiện chưa có tiến trình nào đang chạy.</div><div class="empty-subtitle">Dán 1 mớ link vào ô phía trên rồi bấm "Bắt Đầu" để hệ thống tự lọc và copy.</div></div>';
           globalTasksData = [];
           return;
         }
