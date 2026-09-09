@@ -350,10 +350,16 @@
     let requestBusy = false;
     let selectedTaskId = null;
     
-    // Hệ thống thông báo mới
-    let notifications = [];
-    let unreadCount = 0;
-    let notifiedTaskIds = new Set();
+    // Tích hợp LocalStorage lưu vĩnh viễn trạng thái chuông
+    let notifications = JSON.parse(localStorage.getItem('cloner_notifs') || '[]');
+    let unreadCount = parseInt(localStorage.getItem('cloner_unread') || '0');
+    let notifiedTaskIds = new Set(JSON.parse(localStorage.getItem('cloner_notified_ids') || '[]'));
+
+    function saveNotiState() {
+        localStorage.setItem('cloner_notifs', JSON.stringify(notifications));
+        localStorage.setItem('cloner_unread', unreadCount.toString());
+        localStorage.setItem('cloner_notified_ids', JSON.stringify([...notifiedTaskIds]));
+    }
     
     document.addEventListener('click', function() {
         const popup = document.getElementById('notiPopup');
@@ -371,6 +377,7 @@
         const autoSrc = urlParams.get('autoSrc');
         if (autoSrc) document.getElementById('srcUrl').value = autoSrc;
         
+        renderNotifications(); // Hiển thị số lượng ngay lúc vừa load
         loadTasksStatus();
         checkStorage(); 
         if (!pollingStarted) {
@@ -386,9 +393,10 @@
          popup.style.display = 'none';
       } else {
          popup.style.display = 'flex';
-         // XÓA CHẤM ĐỎ NGAY KHI BẤM MỞ CHUÔNG
+         // Bấm vào chuông -> Dọn sạch chấm đỏ và lưu vào bộ nhớ
          if (unreadCount > 0) {
              unreadCount = 0;
+             saveNotiState();
              document.getElementById('notiBadge').style.display = 'none';
          }
       }
@@ -408,7 +416,10 @@
                 hasNew = true;
             }
         });
-        if (hasNew) renderNotifications();
+        if (hasNew) {
+            saveNotiState();
+            renderNotifications();
+        }
     }
 
     function renderNotifications() {
@@ -440,8 +451,9 @@
     function clearAllNotifications() {
         notifications = [];
         unreadCount = 0;
+        saveNotiState();
         renderNotifications();
-        document.getElementById('notiPopup').style.display = 'none'; // Tự đóng popup
+        document.getElementById('notiPopup').style.display = 'none';
     }
 
     function switchTab(tabId, el, isBottomNav = false) {
@@ -619,14 +631,13 @@
         setApiStatus(true);
         globalTasksData = tasks || [];
         
-        // Sắp xếp tác vụ mới nhất lên đầu danh sách
         globalTasksData.sort((a, b) => {
             let timeA = parseInt(a.id.split('_')[1]) || 0;
             let timeB = parseInt(b.id.split('_')[1]) || 0;
             return timeB - timeA;
         });
         
-        updateNotifications();
+        updateNotifications(); // Tự tính toán số lượng vào bộ nhớ
 
         const runningTasks = globalTasksData.filter(t => !t.completed);
         const historyTasks = globalTasksData.filter(t => t.completed);
