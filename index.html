@@ -3,165 +3,301 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drive Cloud Cloner</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='rgba(56,189,248,0.2)' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z'/><polygon fill='%230ea5e9' points='13 2 9 13 12 13 11 22 15 11 12 11 13 2'/></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <title>Drive Cloud Cloner - Pro Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
-    :root { --primary: #38bdf8; --card-border: rgba(255, 255, 255, 0.08); --card-bg: rgba(13, 19, 33, 0.95); --text: #f8fafc; --text-dim: #94a3b8; }
+    :root { 
+      --bg-main: #0B1120; --bg-sidebar: #0F172A; --bg-card: #1E293B; --bg-card-hover: #334155;
+      --primary: #0EA5E9; --primary-hover: #0284C7; --success: #10B981; --warning: #F59E0B; --danger: #EF4444;
+      --text-main: #F8FAFC; --text-dim: #94A3B8; --border: rgba(255, 255, 255, 0.08);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #060913; color: var(--text); width: 100vw; min-height: 100vh; overflow-x: hidden; }
-    .btn-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
-    .btn-submit:hover { box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35); transform: translateY(-2px);}
-    .btn-submit:disabled { opacity: .65; cursor: wait; transform: none; box-shadow: none;}
-    .container { width: 100%; min-height: 100vh; padding: 25px 4%; display: flex; flex-direction: column; }
-    .app-header { display: flex; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;}
-    .backend-badge { display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.18); color:#4ade80; transition: 0.3s;}
-    .backend-badge.offline { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.18); color:#f87171; }
-    .backend-badge .api-dot { margin:0; }
-    .form-help { color:var(--text-dim); font-size:12px; margin-top:16px; line-height:1.5; text-align: center;}
-    .task-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-    .toolbar-spacer { flex:1; }
-    .btn-secondary { background:rgba(255,255,255,.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); padding:9px 16px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:0.2s; display: flex; align-items: center; justify-content: center;}
-    .btn-secondary:hover { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,0.3); color: #fff; }
-    .empty-card { min-height:190px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:30px; }
-    .empty-icon { font-size:54px; opacity:.75; margin-bottom:14px; }
-    .empty-title { font-size:17px; font-weight:800; margin-bottom:8px; }
-    .empty-subtitle { color:var(--text-dim); font-size:13px; line-height:1.5; }
-    .app-title { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 800; color: var(--primary); flex-grow: 1;}
-    .app-title svg { filter: drop-shadow(0px 2px 6px rgba(56, 189, 248, 0.4)); margin-right: 4px; }
-    .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; margin-bottom: 25px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-    .step-badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
-    .form-group { margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03);}
-    label { display: block; font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
-    input[type="text"], textarea { width: 100%; padding: 14px 16px; background: rgba(6, 9, 19, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: inherit; transition: 0.2s;}
-    input[type="text"]:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
-    textarea { resize: vertical; min-height: 90px; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; font-size: 14px; }
+    
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+    /* LAYOUT */
+    .sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: 0.3s; z-index: 100;}
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); z-index: 10;}
+    .content-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+
+    /* SIDEBAR */
+    .brand { padding: 24px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; color: var(--primary); }
+    .brand svg { filter: drop-shadow(0px 2px 6px rgba(14, 165, 233, 0.4)); }
+    .menu { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-dim); text-decoration: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .menu-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+    .menu-item.active { background: rgba(14, 165, 233, 0.1); color: var(--primary); }
+    .user-profile { padding: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 36px; height: 36px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff;}
+
+    /* TOPBAR */
+    .search-bar { display: flex; align-items: center; background: var(--bg-card); padding: 10px 16px; border-radius: 8px; width: 300px; border: 1px solid var(--border); }
+    .search-bar input { background: transparent; border: none; outline: none; color: #fff; margin-left: 8px; width: 100%; font-family: inherit;}
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .server-status { display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
+    .time-display { text-align: right; line-height: 1.2; }
+    .time-date { font-size: 12px; color: var(--text-dim); }
+    .time-clock { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+    /* DASHBOARD GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .stat-card { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between;}
+    .stat-title { font-size: 13px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px;}
+    .stat-value { font-size: 28px; font-weight: 800; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
+    
+    .main-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 20px; flex: 1; min-height: 0; }
+    .panel { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+    .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);}
+    .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+    /* FORMS & BUTTONS */
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; }
+    input[type="text"], textarea { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 13px; font-family: inherit; transition: 0.2s; outline: none;}
+    input[type="text"]:focus, textarea:focus { border-color: var(--primary); }
+    textarea { resize: vertical; min-height: 80px; }
+    
+    .btn { padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; border: none; transition: 0.2s; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;}
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);}
+    .btn-primary:disabled { opacity: 0.7; cursor: wait; transform: none; box-shadow: none;}
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); }
+    
+    .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px;}
+    .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); cursor: pointer;}
+    .checkbox-item input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer;}
+
+    /* LIST ITEMS */
+    .task-item { padding: 16px; border: 1px solid var(--border); background: rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+    .task-item:hover { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.15); }
+    .task-item.active-select { border-color: var(--primary); background: rgba(14, 165, 233, 0.05); }
+    .task-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .task-name { font-weight: 700; color: var(--primary); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;}
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .badge.running { background: rgba(14, 165, 233, 0.15); color: var(--primary); border: 1px solid rgba(14, 165, 233, 0.2); }
+    .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 8px;}
+    .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: width 0.3s; }
+    .task-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-top: 8px;}
+
+    /* DETAIL PANEL */
+    .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;}
+    .detail-label { color: var(--text-dim); }
+    .detail-val { font-weight: 600; text-align: right; max-width: 60%; word-break: break-all;}
+    .log-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 15px;}
+    .log-line { margin-bottom: 6px; border-bottom: 1px dotted rgba(255,255,255,0.05); padding-bottom: 4px;}
+
+    /* MOBILE / EXTENSION RESPONSIVE */
+    .bottom-nav { display: none; }
+    
+    @media (max-width: 1024px) {
+      .main-grid { grid-template-columns: 1fr 1fr; }
+      .detail-panel { grid-column: span 2; }
+    }
+    
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { display: none; }
+      .topbar { padding: 0 16px; height: 60px; }
+      .search-bar { display: none; }
+      .main-grid { grid-template-columns: 1fr; display: flex; flex-direction: column;}
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .content-area { padding: 16px; }
+      
+      /* Biến sidebar thành Bottom Nav cho Extension */
+      .bottom-nav { display: flex; justify-content: space-around; background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; position: sticky; bottom: 0;}
+      .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); font-size: 10px; font-weight: 600; cursor: pointer;}
+      .nav-item.active { color: var(--primary); }
+      .nav-item svg { width: 20px; height: 20px; }
+      
+      /* Tabs control for Mobile */
+      .panel { display: none; }
+      .panel.active-tab { display: flex; flex: 1;}
+    }
+
+    /* Modal Chọn Thư mục (Dùng chung) */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
-    .folder-modal-content { background: #0d1321; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; width: 100%; max-width: 600px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
-    .folder-item-wrap { display:flex; justify-content:space-between; align-items:center; border-radius: 8px; transition: 0.2s; padding: 4px; margin-bottom: 4px;}
-    .folder-item-wrap:hover { background: rgba(56, 189, 248, 0.1); }
-    .folder-item { flex:1; padding: 10px 12px; font-size: 14px; font-weight: 600; color: #e2e8f0; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px;}
-    .folder-item-wrap:hover .folder-item { color: #38bdf8; }
-    .btn-select-folder { background:rgba(56,189,248,0.2); color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:800; margin-right:4px; transition:0.2s; }
-    .btn-select-folder:hover { background:#38bdf8; color:#060913; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);}
-    .active-tasks-section { margin-top: 10px; padding-bottom: 30px; }
-    .section-title { font-size: 15px; font-weight: 800; color: #cbd5e1; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
-    .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .task-name { font-size: 15px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
-    .task-status { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); white-space: nowrap; }
-    .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
-    .current-file-box span { color: #e2e8f0; font-weight: 600; }
-    .progress-wrap { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.05); border-radius: 10px; padding: 12px; }
-    .progress-label { display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); margin-bottom:8px; font-weight:700; }
-    .progress-track { width:100%; height:8px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
-    .progress-bar { height:100%; border-radius:99px; background:linear-gradient(90deg,#0284c7,#38bdf8); transition:width .35s ease; }
-    .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .metric-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); padding: 12px 6px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .metric-box:hover { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); transform: translateY(-2px);}
-    .metric-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; }
-    .metric-value { font-size: 15px; color: #fff; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
-    .btn-kill { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; margin-top: 4px;}
-    .btn-kill:hover { background: rgba(239, 68, 68, 0.25); color: #fff;}
-    .modal-content { background: #0d1321; border: 1px solid var(--card-border); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-    .modal-header { padding: 20px 24px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 17px; color: var(--primary); }
-    .modal-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s;}
-    .modal-close:hover { background: rgba(239, 68, 68, 0.2); color: #fff; border-color: rgba(239, 68, 68, 0.4);}
-    .modal-body { padding: 20px 24px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; flex-grow: 1; }
-    .modal-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 4px solid var(--primary); border-radius: 8px; padding: 14px; margin-bottom: 12px; word-break: break-all; }
-    .modal-item-name { color: #f8fafc; font-weight: 700; margin-bottom: 6px; }
-    .modal-item-desc { color: var(--text-dim); font-size: 12px; }
-    .empty-msg { text-align: center; color: var(--text-dim); padding: 40px; font-size: 14px; font-weight: 600;}
-    .api-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#64748b; margin-right:5px; transition: 0.3s; }
-    .api-dot.online { background:#22c55e; box-shadow: 0 0 8px #22c55e;}
-    .api-dot.offline { background:#ef4444; box-shadow: 0 0 8px #ef4444;}
-    .storage-box { display:none; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px 18px; margin-top: 20px; }
-    .storage-header { display: flex; justify-content: space-between; font-size: 13px; color: #cbd5e1; margin-bottom: 10px; font-weight: 700; }
-    .storage-value { color: #fff; font-family: 'JetBrains Mono', monospace; }
+    .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
+    .modal-header { padding: 16px 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; }
+    .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
   </style>
 </head>
 <body>
-  <div class="container" id="mainApp">
-    <div class="app-header">
-      <div class="app-title">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" style="margin-right: 10px;">
-          <path fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
-          <polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"></polygon>
-        </svg>
-        Drive Cloud Cloner
-      </div>
-      <div style="display:flex; align-items:center; gap: 10px;">
-        <div class="backend-badge" id="apiStatus"><span class="api-dot" id="apiDot"></span><span id="apiStatusText">Đang tải...</span></div>
-        <button class="btn-secondary" onclick="window.open(window.location.href, '_blank')" title="Mở trang web ở Tab mới để không bị đóng">📌 Tab Mới</button>
-      </div>
+
+  <!-- SIDEBAR (Desktop) -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="rgba(14, 165, 233, 0.2)" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"/></svg>
+      Cloud Cloner
     </div>
-    
-    <div class="form-box">
-      <div class="form-group">
-        <div class="step-badge">Bước 1: Link Nguồn</div>
-        <label>Dán link gốc hoặc nguyên đoạn văn chứa nhiều link:</label>
-        <textarea id="srcUrl" placeholder="Ví dụ: Anh em tải tài liệu tại https://drive.google.com/... nhé!"></textarea>
+    <div class="menu">
+      <a class="menu-item active" onclick="switchTab('tab-overview', this)"><span style="font-size: 18px;">📊</span> Tổng quan</a>
+      <a class="menu-item" onclick="switchTab('tab-create', this)"><span style="font-size: 18px;">➕</span> Tạo tác vụ</a>
+      <a class="menu-item" onclick="switchTab('tab-list', this)"><span style="font-size: 18px;">📋</span> Tiến trình</a>
+      <a class="menu-item" onclick="switchTab('tab-history', this)"><span style="font-size: 18px;">🕒</span> Lịch sử</a>
+      <a class="menu-item" style="margin-top: auto;" onclick="alert('Chức năng cài đặt đang hoàn thiện')"><span style="font-size: 18px;">⚙️</span> Cài đặt</a>
+    </div>
+    <div class="user-profile">
+      <div class="avatar">U</div>
+      <div style="font-size: 13px; font-weight: 600;">user@gmail.com</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Tìm kiếm tác vụ, file, thư mục...">
       </div>
-      
-      <div class="form-group">
-        <div class="step-badge">Bước 2: Nơi Lưu Trữ (Đích)</div>
-        <label>Đường dẫn thư mục sẽ nhận file:</label>
-        <div style="display: flex; gap: 10px;">
-          <input type="text" id="dstUrl" placeholder="https://drive.google.com/drive/folders/...">
-          <button id="btnBrowseDst" class="btn-secondary" onclick="openFolderModal()" style="padding: 0 20px; font-size: 16px;">📁 Chọn</button>
+      <div class="topbar-right">
+        <div class="server-status" id="apiStatus">
+          <div class="status-dot" id="apiDot"></div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--success);" id="apiStatusText">Đang tải...</div>
+            <div style="font-size: 10px; color: var(--text-dim);">API hoạt động bình thường</div>
+          </div>
+        </div>
+        <div class="time-display">
+          <div class="time-date" id="dateStr">--</div>
+          <div class="time-clock" id="timeStr">--:--:--</div>
         </div>
       </div>
-      
-      <button id="btnStart" class="btn-submit" onclick="startNewTask()">🚀 Bắt Đầu Sao Chép Nền</button>
+    </header>
 
-      <div class="storage-box" id="storageBox">
-        <div class="storage-header">
-          <span>☁️ Dung lượng Google Drive</span>
-          <span class="storage-value" id="storageText">Đang quét...</span>
+    <div class="content-area">
+      <!-- Lời chào -->
+      <div>
+        <h1 style="font-size: 24px; color: var(--primary); margin-bottom: 4px;">Xin chào!</h1>
+        <p style="color: var(--text-dim);">Sao chép dữ liệu Google Drive nhanh chóng, an toàn.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title"><span>📁</span> Tổng tác vụ</div>
+          <div class="stat-value" id="stTotal">0</div>
+          <div style="font-size: 12px; color: var(--success); margin-top: 4px;">Hoạt động hôm nay</div>
         </div>
-        <div class="progress-track"><div class="progress-bar" id="storageBar" style="width: 0%; background: #38bdf8;"></div></div>
+        <div class="stat-card" style="border-color: rgba(14, 165, 233, 0.3);">
+          <div class="stat-title"><span>▶️</span> Đang chạy</div>
+          <div class="stat-value" style="color: var(--primary);" id="stRun">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title"><span>✅</span> Hoàn thành</div>
+          <div class="stat-value" style="color: var(--success);" id="stDone">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title"><span>☁️</span> Dung lượng Drive</div>
+          <div class="stat-value" style="font-size: 18px; margin-top: 15px;" id="storageText">Đang quét...</div>
+          <div class="progress-bar-bg" style="height: 4px;"><div class="progress-bar-fill" id="storageBar" style="width: 0%; background: var(--warning);"></div></div>
+        </div>
+      </div>
+
+      <!-- Main Layout 3 Cột (Sẽ thành các Tab trên Mobile) -->
+      <div class="main-grid">
+        
+        <!-- CỘT 1: TẠO TÁC VỤ -->
+        <div class="panel active-tab" id="tab-create">
+          <div class="panel-header">➕ Tạo tác vụ mới</div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label>Dán link (Hỗ trợ lọc nhiều link)</label>
+              <textarea id="srcUrl" placeholder="Dán link thư mục, tệp, hoặc nguyên đoạn văn bản vào đây..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Thư mục đích</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="dstUrl" placeholder="https://drive.google.com/drive/folders/..." style="flex:1;">
+                <button class="btn btn-outline" onclick="openFolderModal()" style="padding: 0 12px;" title="Duyệt Drive">📁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Tùy chọn hệ thống</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" checked disabled> Tự động kiểm tra quyền truy cập</label>
+                <label class="checkbox-item"><input type="checkbox" checked disabled> Bỏ qua file trùng tên (Chống lặp)</label>
+                <label class="checkbox-item"><input type="checkbox" checked disabled> Lọc link tự động từ đoạn văn</label>
+              </div>
+            </div>
+            <button id="btnStart" class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="startNewTask()">▶ BẮT ĐẦU SAO CHÉP</button>
+          </div>
+        </div>
+
+        <!-- CỘT 2: DANH SÁCH TÁC VỤ -->
+        <div class="panel" id="tab-list">
+          <div class="panel-header">
+            <span>📋 Danh sách tác vụ</span>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="loadTasksStatus()">↻</button>
+          </div>
+          <div class="panel-body" style="padding: 16px;" id="tasksListContainer">
+            <div class="empty-card" style="min-height: 100px; padding: 20px;">Đang tải dữ liệu...</div>
+          </div>
+        </div>
+
+        <!-- CỘT 3: CHI TIẾT & LOG -->
+        <div class="panel" id="tab-overview">
+          <div class="panel-header">
+            <span id="detailTitle">Chi tiết tác vụ</span>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillTask" style="display:none;">Hủy tác vụ</button>
+          </div>
+          <div class="panel-body" id="detailContainer">
+            <div style="text-align: center; color: var(--text-dim); margin-top: 50px;">Bấm vào một tác vụ ở danh sách để xem chi tiết.</div>
+          </div>
+        </div>
+
+        <!-- Tab Lịch sử (Fake) -->
+        <div class="panel" id="tab-history" style="display: none;">
+          <div class="panel-header">🕒 Lịch sử hoạt động</div>
+          <div class="panel-body">Chưa có lịch sử cũ.</div>
+        </div>
+
       </div>
     </div>
-    
-    <div class="active-tasks-section">
-      <div class="task-toolbar">
-        <div class="section-title" id="sectionTitle">TIẾN TRÌNH ĐANG CHẠY NGẦM</div>
-        <div class="toolbar-spacer"></div>
-        <button class="btn-secondary" onclick="loadTasksStatus()">↻ Làm mới</button>
-      </div>
-      <div id="tasksListContainer"></div>
-    </div>
-  </div>
+  </main>
 
-  <div id="infoModal" class="modal-overlay" onclick="closeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header" id="modalTitle">Chi tiết thông tin</div>
-      <div class="modal-body" id="modalListContainer"></div>
-    </div>
-  </div>
+  <!-- BOTTOM NAV (Dành riêng cho Màn hình nhỏ/Extension) -->
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="switchTab('tab-overview', this, true)"><span>📊</span> Tổng quan</div>
+    <div class="nav-item active" onclick="switchTab('tab-create', this, true)"><span>➕</span> Tạo task</div>
+    <div class="nav-item" onclick="switchTab('tab-list', this, true)"><span>📋</span> Tiến trình</div>
+  </nav>
 
+  <!-- Modal Trình Duyệt Thư Mục -->
   <div id="folderModal" class="modal-overlay" onclick="closeFolderModal()">
-    <div class="folder-modal-content" onclick="event.stopPropagation()">
+    <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <span style="display: flex; align-items: center; gap: 8px;">🗂️ Trình Duyệt Drive</span>
-        <button class="modal-close" onclick="closeFolderModal()">Đóng ✕</button>
+        <span>🗂️ Trình Duyệt Drive</span>
+        <button class="btn btn-outline" style="padding: 4px 8px; border:none;" onclick="closeFolderModal()">✕</button>
       </div>
-      <div id="folderModalTopBar" style="padding: 16px 24px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center;">
-      </div>
-      <div class="modal-body" id="folderListContainer" style="padding: 16px 24px;">
-      </div>
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--border);" id="folderModalTopBar"></div>
+      <div class="modal-body" id="folderListContainer"></div>
     </div>
   </div>
-  
+
   <script>
+    // Link API Google Apps Script đã được chèn chuẩn:
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
-    
+
     let globalTasksData = [];
     let pollingStarted = false;
     let requestBusy = false;
-    let folderHistory = [];
-    let currentFolderId = '';
-    let currentFolderName = 'My Drive';
+    let selectedTaskId = null;
+    
+    // Khởi tạo Đồng hồ
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('timeStr').innerText = now.toLocaleTimeString('vi-VN', {hour12: false});
+      document.getElementById('dateStr').innerText = now.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' });
+    }, 1000);
 
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -175,6 +311,29 @@
             setInterval(loadTasksStatus, 8000);
         }
     };
+
+    // LOGIC CHUYỂN TAB (Cho Mobile/Extension)
+    function switchTab(tabId, el, isBottomNav = false) {
+      if(window.innerWidth > 768 && tabId !== 'tab-history') return; 
+
+      const items = isBottomNav ? document.querySelectorAll('.nav-item') : document.querySelectorAll('.menu-item');
+      items.forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+
+      document.querySelectorAll('.panel').forEach(p => {
+        p.classList.remove('active-tab');
+        if(window.innerWidth <= 768) p.style.display = 'none';
+      });
+      
+      const target = document.getElementById(tabId);
+      target.classList.add('active-tab');
+      if(window.innerWidth <= 768) target.style.display = 'flex';
+      else if(tabId === 'tab-history') {
+        document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+        target.style.display = 'flex';
+        target.style.gridColumn = 'span 3';
+      }
+    }
 
     function escapeHtml(value) {
       return String(value == null ? '' : value).replace(/[&<>'"]/g, function(c) {
@@ -211,13 +370,11 @@
           const usedGB = (res.used / (1024*1024*1024)).toFixed(2);
           const limitGB = (res.limit / (1024*1024*1024)).toFixed(2);
           const pct = (res.limit > 0) ? Math.min(100, Math.round((res.used / res.limit) * 100)) : 0;
-          document.getElementById('storageBox').style.display = 'block';
-          document.getElementById('storageText').innerText = `${usedGB} / ${limitGB} GB (${pct}%)`;
+          
+          document.getElementById('storageText').innerText = `${usedGB} / ${limitGB} GB`;
           const bar = document.getElementById('storageBar');
           bar.style.width = pct + '%';
-          if (pct > 90) bar.style.background = '#ef4444'; 
-          else if (pct > 75) bar.style.background = '#f59e0b'; 
-          else bar.style.background = '#22c55e'; 
+          if (pct > 90) bar.style.background = 'var(--danger)'; 
         }
       }, 15000);
     }
@@ -225,231 +382,189 @@
     function setApiStatus(isOnline) {
       const dot = document.getElementById('apiDot');
       const text = document.getElementById('apiStatusText');
-      if (!dot || !text) return;
       if (isOnline) {
-        dot.className = 'api-dot online';
-        text.innerText = 'Máy chủ Online';
+        dot.style.background = 'var(--success)'; dot.style.boxShadow = '0 0 10px var(--success)';
+        text.innerText = 'Server Online'; text.style.color = 'var(--success)';
       } else {
-        dot.className = 'api-dot offline';
-        text.innerText = 'Mất kết nối';
+        dot.style.background = 'var(--danger)'; dot.style.boxShadow = '0 0 10px var(--danger)';
+        text.innerText = 'Mất kết nối'; text.style.color = 'var(--danger)';
       }
     }
 
+    /* ==== MODAL THƯ MỤC ==== */
+    let folderHistory = [];
+    let currentFolderId = '';
+    let currentFolderName = 'My Drive';
+
     function openFolderModal() {
       document.getElementById('folderModal').style.display = 'flex';
-      folderHistory = [];
-      currentFolderId = '';
-      currentFolderName = 'My Drive';
+      folderHistory = []; currentFolderId = ''; currentFolderName = 'My Drive';
       loadFolderData();
     }
-
-    function closeFolderModal() {
-      document.getElementById('folderModal').style.display = 'none';
-    }
+    function closeFolderModal() { document.getElementById('folderModal').style.display = 'none'; }
 
     function loadFolderData() {
       const topBar = document.getElementById('folderModalTopBar');
       const listContainer = document.getElementById('folderListContainer');
-      listContainer.innerHTML = '<div style="padding:40px; color:#38bdf8; font-size:14px; text-align:center; font-weight:600;">🔄 Đang tải dữ liệu từ Google Drive...</div>';
+      listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--primary);">Đang tải dữ liệu Drive...</div>';
 
-      let navHtml = '';
-      if (currentFolderId) {
-        navHtml += `<button class="btn-secondary" onclick="goBackFolder(event)" style="padding: 6px 12px; font-size: 12px;">🔙 Trở lại</button>`;
-        navHtml += `<div style="font-size:13px; color:#94a3b8; font-weight:700; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(currentFolderName)}">📂 ${escapeHtml(currentFolderName)}</div>`;
-      } else {
-        navHtml += `<div style="font-size:13px; color:#94a3b8; font-weight:800;">📂 MY DRIVE (Gốc)</div>`;
-      }
-      navHtml += `<button class="btn-secondary" onclick="loadFolderData()" style="padding: 6px 12px; font-size: 12px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">↻ Tải Lại</button>`;
+      let navHtml = currentFolderId 
+        ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size:12px;" onclick="goBackFolder(event)">🔙 Quay lại</button> <span style="font-weight:700; font-size:13px;">${escapeHtml(currentFolderName)}</span>`
+        : `<span style="font-weight:800; font-size:13px;">📂 MY DRIVE</span>`;
       topBar.innerHTML = navHtml;
 
       jsonpRequest('getFolders', { parentId: currentFolderId }, function(err, res) {
-        if (err || !res.success) {
-          listContainer.innerHTML = '<div style="padding:30px; color:#fca5a5; font-size:14px; text-align:center; font-weight:600;">⚠️ Không thể tải danh sách thư mục.</div>';
-          return;
-        }
+        if (err || !res.success) { listContainer.innerHTML = '<div style="color:var(--danger); text-align:center;">Lỗi tải thư mục</div>'; return; }
         
         let html = '';
         if (currentFolderId) {
-            html += `<div style="padding: 14px; background: rgba(34, 197, 94, 0.15); border: 2px dashed #22c55e; border-radius: 12px; margin-bottom: 20px; text-align: center; cursor: pointer; color: #4ade80; font-weight: 800; font-size: 14px; transition:0.2s;" onmouseover="this.style.background='#22c55e'; this.style.color='#060913'" onmouseout="this.style.background='rgba(34, 197, 94, 0.15)'; this.style.color='#4ade80'" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC [${escapeHtml(currentFolderName)}] LÀM ĐÍCH</div>`;
+            html += `<button class="btn btn-primary" style="width:100%; margin-bottom:12px; background: rgba(16,185,129,0.2); color:var(--success);" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC NÀY</button>`;
         }
-
-        if (!res.folders || res.folders.length === 0) {
-          html += '<div style="padding:30px; color:#64748b; font-size:14px; text-align:center; font-weight:600;">Thư mục này trống.</div>';
-        } else {
+        if (!res.folders || res.folders.length === 0) { html += '<div style="text-align:center; color:var(--text-dim);">Thư mục trống.</div>'; } 
+        else {
           res.folders.forEach(f => {
              let safeName = f.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-             html += `<div class="folder-item-wrap">
-                        <div class="folder-item" title="Nhấn để mở thư mục này" onclick="navToFolder('${f.id}', '${safeName}', event)">
-                          <span style="font-size: 18px;">📁</span> ${escapeHtml(f.name)}
-                        </div>
-                        <button class="btn-select-folder" title="Chọn thư mục này" onclick="selectFolder('${f.id}', event)">Chọn</button>
+             html += `<div class="task-item" style="display:flex; justify-content:space-between; align-items:center; padding: 10px;" onclick="navToFolder('${f.id}', '${safeName}', event)">
+                        <span style="font-weight:600;">📁 ${escapeHtml(f.name)}</span>
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size:11px;" onclick="selectFolder('${f.id}', event); event.stopPropagation();">Chọn</button>
                       </div>`;
           });
         }
         listContainer.innerHTML = html;
-      }, 25000);
+      });
     }
 
-    function navToFolder(id, name, event) {
-        if (event) event.stopPropagation();
-        folderHistory.push({id: currentFolderId, name: currentFolderName});
-        currentFolderId = id;
-        currentFolderName = name;
-        loadFolderData();
-    }
-    
-    function goBackFolder(event) {
-        if (event) event.stopPropagation();
-        if(folderHistory.length > 0) {
-            let prev = folderHistory.pop();
-            currentFolderId = prev.id;
-            currentFolderName = prev.name;
-        } else {
-            currentFolderId = '';
-            currentFolderName = 'My Drive';
-        }
-        loadFolderData();
-    }
+    function navToFolder(id, name, e) { if(e) e.stopPropagation(); folderHistory.push({id: currentFolderId, name: currentFolderName}); currentFolderId = id; currentFolderName = name; loadFolderData(); }
+    function goBackFolder(e) { if(e) e.stopPropagation(); if(folderHistory.length > 0) { let prev = folderHistory.pop(); currentFolderId = prev.id; currentFolderName = prev.name; } else { currentFolderId = ''; currentFolderName = 'My Drive'; } loadFolderData(); }
+    function selectFolder(id, e) { if(e) e.stopPropagation(); document.getElementById('dstUrl').value = 'https://drive.google.com/drive/folders/' + id; closeFolderModal(); }
 
-    function selectFolder(id, event) {
-      if (event) event.stopPropagation();
-      document.getElementById('dstUrl').value = 'https://drive.google.com/drive/folders/' + id;
-      closeFolderModal();
-    }
-
+    /* ==== CORE LOGIC ==== */
     function startNewTask() {
-      if (requestBusy) return alert('Đang gửi yêu cầu, vui lòng chờ...');
+      if (requestBusy) return alert('Hệ thống đang bận...');
       const srcText = document.getElementById('srcUrl').value.trim();
       const dst = document.getElementById('dstUrl').value.trim();
-      
-      if (!srcText || !dst) return alert('Vui lòng nhập đủ Nguồn và Đích!');
+      if (!srcText || !dst) return alert('Nhập đủ Nguồn và Đích!');
 
-      const regex = /(https:\/\/drive\.google\.com\/[^\s'"]+)/g;
-      let matchedLinks = srcText.match(regex) || [];
-      let uniqueLinks = [...new Set(matchedLinks)];
-
+      let uniqueLinks = [...new Set(srcText.match(/(https:\/\/drive\.google\.com\/[^\s'"]+)/g) || [])];
       if (uniqueLinks.length === 0) uniqueLinks = [srcText];
 
       const btn = document.getElementById('btnStart');
-      requestBusy = true;
-      btn.disabled = true;
-      btn.innerText = `Đang khởi tạo ${uniqueLinks.length} tiến trình...`;
+      requestBusy = true; btn.disabled = true; btn.innerText = `Đang khởi tạo...`;
 
       jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
         if (diagErr || !diag || !diag.success) {
-          requestBusy = false;
-          btn.disabled = false;
-          btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
+          requestBusy = false; btn.disabled = false; btn.innerText = '▶ BẮT ĐẦU SAO CHÉP';
           return alert('Lỗi kiểm tra quyền truy cập thư mục!');
         }
-
         jsonpRequest('create_batch', {srcList: JSON.stringify(uniqueLinks), dst: dst}, function(err, res) {
-          requestBusy = false;
-          btn.disabled = false;
-          btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
-          if (err) {
-            alert(err.message);
-            loadTasksStatus();
-            return;
-          }
+          requestBusy = false; btn.disabled = false; btn.innerText = '▶ BẮT ĐẦU SAO CHÉP';
+          if (err) return alert(err.message);
           if (res && res.success) {
-            document.getElementById('srcUrl').value = '';
-            document.getElementById('dstUrl').value = '';
-            loadTasksStatus();
-            checkStorage(); 
-          } else {
-            alert('Lỗi: ' + (res ? (res.error || 'Unknown') : 'Unknown'));
-          }
-        }, 60000); 
-      }, 15000);
+            document.getElementById('srcUrl').value = ''; document.getElementById('dstUrl').value = '';
+            loadTasksStatus(); checkStorage();
+            if(window.innerWidth <= 768) switchTab('tab-list', document.querySelectorAll('.nav-item')[2], true); 
+          } else { alert('Lỗi: ' + (res ? res.error : 'Unknown')); }
+        }); 
+      });
     }
 
     function loadTasksStatus() {
       jsonpRequest('list', {}, function(err, tasks) {
         const container = document.getElementById('tasksListContainer');
-        const titleEl = document.getElementById('sectionTitle');
-        if (!container || !titleEl) return;
-        
-        if (err) {
-          setApiStatus(false);
-          container.innerHTML = '<div style="color:#fca5a5; padding: 20px; text-align:center;">⚠️ Lỗi kết nối máy chủ. F5 lại trang.</div>';
-          return;
-        }
+        if (err) { setApiStatus(false); return; }
         
         setApiStatus(true);
+        globalTasksData = tasks || [];
         
-        if (!Array.isArray(tasks) || tasks.length === 0) {
-          titleEl.innerText = 'TIẾN TRÌNH ĐANG CHẠY NGẦM';
-          container.innerHTML = '<div class="empty-card"><div class="empty-icon">📁</div><div class="empty-title">Không có tiến trình nào đang chạy.</div><div class="empty-subtitle">Hệ thống sẵn sàng nhận lệnh sao chép mới.</div></div>';
-          globalTasksData = [];
+        document.getElementById('stTotal').innerText = tasks.length;
+        document.getElementById('stRun').innerText = tasks.filter(t => !t.completed).length;
+        document.getElementById('stDone').innerText = tasks.filter(t => t.completed).length;
+
+        if (tasks.length === 0) {
+          container.innerHTML = '<div class="empty-card">Không có tác vụ nào.<br>Tạo mới ở cột bên cạnh.</div>';
+          if(selectedTaskId) { renderDetail(null); selectedTaskId = null; }
           return;
         }
-        globalTasksData = tasks;
+
         let html = '';
         tasks.forEach(t => {
-          const id = escapeHtml(t.id || '');
-          const displayName = escapeHtml(t.taskName ? t.taskName : ('Task: ' + (t.id || '')));
-          const status = escapeHtml(t.statusMsg || 'Đang xử lý');
-          const lastFile = escapeHtml(t.lastFile || 'Khởi tạo...');
+          const id = escapeHtml(t.id);
+          const name = escapeHtml(t.taskName);
+          const isDone = t.completed;
+          const status = isDone ? 'Hoàn thành' : 'Đang chạy';
+          const badgeClass = isDone ? 'success' : 'running';
           const pct = Math.max(0, Math.min(100, Number(t.progressPercent) || 0));
+          const isActive = (id === selectedTaskId) ? 'active-select' : '';
+          
           html += `
-            <div class="task-item-card">
+            <div class="task-item ${isActive}" onclick="selectTask('${id}')">
               <div class="task-top">
-                <div class="task-name">${displayName}</div>
-                <div class="task-status">${status}</div>
+                <div class="task-name" title="${name}">${name}</div>
+                <div class="badge ${badgeClass}">${status}</div>
               </div>
-              <div class="current-file-box">Xử lý: <span>${lastFile}</span></div>
-              <div class="progress-wrap">
-                <div class="progress-label"><span>Tiến độ</span><span>${pct}%</span></div>
-                <div class="progress-track"><div class="progress-bar" style="width:${pct}%"></div></div>
+              <div style="font-size:12px; color:var(--text-dim);">${pct}% - ${escapeHtml(t.lastFile || '')}</div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+              <div class="task-meta">
+                <span>Quét: ${t.totalScanned||0}</span>
+                <span>Thành công: ${t.copiedFiles||0}</span>
+                <span style="color:var(--danger)">Lỗi/Bỏ qua: ${(t.skippedFiles||0) + (t.queuedFiles||0)}</span>
               </div>
-              <div class="task-metrics">
-                <div class="metric-box" onclick="openDetailModal('${id}', 'scanned')"><div class="metric-label">Quét</div><div class="metric-value">${Number(t.totalScanned)||0}</div></div>
-                <div class="metric-box" onclick="openDetailModal('${id}', 'copied')"><div class="metric-label">Thành công</div><div class="metric-value">${Number(t.copiedFiles)||0}</div></div>
-                <div class="metric-box" onclick="openDetailModal('${id}', 'queued')"><div class="metric-label">Chờ xử lý</div><div class="metric-value">${Number(t.queuedFiles)||0}</div></div>
-                <div class="metric-box" onclick="openDetailModal('${id}', 'skipped')"><div class="metric-label">Bỏ qua</div><div class="metric-value">${Number(t.skippedFiles)||0}</div></div>
-              </div>
-              <button class="btn-kill" onclick="killTask('${id}')">✖ Xóa tiến trình này</button>
             </div>`;
         });
-        titleEl.innerText = `TIẾN TRÌNH ĐANG CHẠY (${tasks.length})`;
         container.innerHTML = html;
-      }, 15000);
+        
+        if(selectedTaskId) renderDetail(globalTasksData.find(t => t.id === selectedTaskId));
+      });
     }
 
-    function killTask(taskId) {
-      if (!confirm('Hủy tiến trình này? Dữ liệu đã copy sẽ không bị xóa.')) return;
-      jsonpRequest('kill', {id: taskId}, function(err, res) {
-        if (err) return alert(err.message);
-        loadTasksStatus();
-      }, 15000);
-    }
-
-    function openDetailModal(taskId, type) {
+    function selectTask(taskId) {
+      selectedTaskId = taskId;
       const task = globalTasksData.find(t => t.id === taskId);
-      if (!task) return;
-      let title = '';
-      let listData = [];
-      if (type === 'scanned') { title = '📂 Lịch sử quét'; listData = task.scannedList || []; }
-      else if (type === 'copied') { title = '✅ File thành công'; listData = task.copiedList || []; }
-      else if (type === 'queued') { title = '⏳ File chờ chạy lại'; listData = task.retryQueue || []; }
-      else if (type === 'skipped') { title = '🚫 File bị bỏ qua'; listData = task.skippedList || []; }
-      document.getElementById('modalTitle').innerText = title;
-      
-      let listHtml = '';
-      if (listData.length === 0) {
-        listHtml = '<div class="empty-msg">Trống.</div>';
-      } else {
-        listData.forEach(item => {
-          const name = escapeHtml(item.name || item.fileName || 'Không tên');
-          const desc = escapeHtml(item.reason || 'Đang xử lý');
-          listHtml += `<div class="modal-item"><div class="modal-item-name">📄 ${name}</div><div class="modal-item-desc">Info: ${desc}</div></div>`;
-        });
-      }
-      document.getElementById('modalListContainer').innerHTML = listHtml;
-      document.getElementById('infoModal').style.display = 'flex';
+      document.querySelectorAll('.task-item').forEach(el => el.classList.remove('active-select'));
+      event.currentTarget.classList.add('active-select');
+      renderDetail(task);
+      if(window.innerWidth <= 768) switchTab('tab-overview', document.querySelectorAll('.nav-item')[0], true);
     }
-    function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+
+    function renderDetail(task) {
+      const container = document.getElementById('detailContainer');
+      const btnKill = document.getElementById('btnKillTask');
+      
+      if(!task) {
+        container.innerHTML = '<div style="text-align:center; color:var(--text-dim); margin-top:50px;">Chọn 1 tác vụ để xem chi tiết.</div>';
+        btnKill.style.display = 'none';
+        document.getElementById('detailTitle').innerText = "Chi tiết tác vụ";
+        return;
+      }
+
+      document.getElementById('detailTitle').innerText = task.taskName;
+      btnKill.style.display = 'block';
+      
+      let logs = (task.scannedList || []).slice(-10).reverse().map(l => `<div class="log-line">[${new Date().toLocaleTimeString()}] Đã quét: ${escapeHtml(l.name)}</div>`).join('');
+      if(!logs) logs = "Hệ thống đang khởi tạo log...";
+
+      container.innerHTML = `
+        <div class="detail-row"><span class="detail-label">ID Tác vụ</span><span class="detail-val" style="font-family:monospace; color:var(--primary);">${task.id}</span></div>
+        <div class="detail-row"><span class="detail-label">Trạng thái</span><span class="detail-val ${task.completed ? 'text-success' : 'text-primary'}">${task.statusMsg}</span></div>
+        <div class="detail-row"><span class="detail-label">Tiến độ tổng</span><span class="detail-val">${task.progressPercent}%</span></div>
+        <div class="detail-row"><span class="detail-label">Tổng File đã quét</span><span class="detail-val">${task.totalScanned}</span></div>
+        <div class="detail-row"><span class="detail-label">Sao chép thành công</span><span class="detail-val" style="color:var(--success);">${task.copiedFiles}</span></div>
+        <div class="detail-row"><span class="detail-label">Đang chờ xử lý (Kẹt)</span><span class="detail-val" style="color:var(--warning);">${task.queuedFiles}</span></div>
+        <div class="detail-row"><span class="detail-label">Bỏ qua (Lỗi/Shortcut)</span><span class="detail-val" style="color:var(--danger);">${task.skippedFiles}</span></div>
+        
+        <div style="margin-top:20px; font-weight:700; font-size:13px; color:var(--primary);">Nhật ký hoạt động (Real-time)</div>
+        <div class="log-box">${logs}</div>
+      `;
+    }
+
+    function killSelectedTask() {
+      if(!selectedTaskId || !confirm('Xác nhận hủy tác vụ này? Dữ liệu đã copy sẽ không bị mất.')) return;
+      jsonpRequest('kill', {id: selectedTaskId}, function(err) {
+        if(err) alert(err.message);
+        selectedTaskId = null;
+        loadTasksStatus();
+      });
+    }
   </script>
 </body>
 </html>
