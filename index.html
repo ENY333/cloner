@@ -140,6 +140,17 @@
       .search-bar, .time-display { display: none; }
       .mobile-brand { display: flex; } 
       
+      /* CĂN GIỮA POPUP THÔNG BÁO TRÊN MÀN HÌNH NHỎ ĐỂ KHÔNG BỊ CẮT VIỀN */
+      .noti-popup {
+        position: fixed;
+        top: 65px;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        width: calc(100vw - 32px);
+        max-width: 380px;
+      }
+      
       .content-area { padding: 16px; gap: 16px; flex: 1;}
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
       
@@ -350,7 +361,7 @@
     let requestBusy = false;
     let selectedTaskId = null;
     
-    // Tích hợp LocalStorage lưu vĩnh viễn trạng thái chuông
+    // Hệ thống LocalStorage vĩnh viễn
     let notifications = JSON.parse(localStorage.getItem('cloner_notifs') || '[]');
     let unreadCount = parseInt(localStorage.getItem('cloner_unread') || '0');
     let notifiedTaskIds = new Set(JSON.parse(localStorage.getItem('cloner_notified_ids') || '[]'));
@@ -377,7 +388,7 @@
         const autoSrc = urlParams.get('autoSrc');
         if (autoSrc) document.getElementById('srcUrl').value = autoSrc;
         
-        renderNotifications(); // Hiển thị số lượng ngay lúc vừa load
+        renderNotifications(); 
         loadTasksStatus();
         checkStorage(); 
         if (!pollingStarted) {
@@ -393,7 +404,6 @@
          popup.style.display = 'none';
       } else {
          popup.style.display = 'flex';
-         // Bấm vào chuông -> Dọn sạch chấm đỏ và lưu vào bộ nhớ
          if (unreadCount > 0) {
              unreadCount = 0;
              saveNotiState();
@@ -637,7 +647,7 @@
             return timeB - timeA;
         });
         
-        updateNotifications(); // Tự tính toán số lượng vào bộ nhớ
+        updateNotifications(); 
 
         const runningTasks = globalTasksData.filter(t => !t.completed);
         const historyTasks = globalTasksData.filter(t => t.completed);
