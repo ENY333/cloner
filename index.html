@@ -14,29 +14,28 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; font-size: 14px; }
     
-    /* SCROLLBAR */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-    /* LAYOUT */
-    .sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: 0.3s; z-index: 100;}
+    /* LAYOUT CORE */
+    .sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: width 0.3s; z-index: 100;}
     .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     .topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); z-index: 10;}
     .content-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
 
-    /* SIDEBAR */
-    .brand { padding: 24px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; color: var(--primary); }
-    .brand svg { filter: drop-shadow(0px 2px 6px rgba(14, 165, 233, 0.4)); }
+    /* SIDEBAR ELEMENTS */
+    .brand { padding: 24px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; color: var(--primary); transition: 0.3s;}
+    .brand svg { filter: drop-shadow(0px 2px 6px rgba(14, 165, 233, 0.4)); flex-shrink: 0;}
     .menu { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
-    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-dim); text-decoration: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-dim); text-decoration: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap;}
     .menu-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
     .menu-item.active { background: rgba(14, 165, 233, 0.1); color: var(--primary); }
-    .user-profile { padding: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-    .avatar { width: 36px; height: 36px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff;}
+    .user-profile { padding: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; white-space: nowrap; overflow: hidden;}
+    .avatar { width: 36px; height: 36px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex-shrink: 0;}
 
-    /* TOPBAR */
+    /* TOPBAR ELEMENTS */
     .search-bar { display: flex; align-items: center; background: var(--bg-card); padding: 10px 16px; border-radius: 8px; width: 300px; border: 1px solid var(--border); }
     .search-bar input { background: transparent; border: none; outline: none; color: #fff; margin-left: 8px; width: 100%; font-family: inherit;}
     .topbar-right { display: flex; align-items: center; gap: 20px; }
@@ -46,13 +45,21 @@
     .time-date { font-size: 12px; color: var(--text-dim); }
     .time-clock { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
 
-    /* DASHBOARD GRID */
+    /* DASHBOARD GRID - CƠ CHẾ MINMAX CHỐNG BÓP NGHẸT */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
     .stat-card { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between;}
     .stat-title { font-size: 13px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px;}
     .stat-value { font-size: 28px; font-weight: 800; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
     
-    .main-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 20px; flex: 1; min-height: 0; }
+    .main-grid { 
+      display: grid; 
+      /* Thay vì ép tỷ lệ % cứng, dùng minmax để giữ form khi thu nhỏ */
+      grid-template-columns: minmax(320px, 1fr) minmax(380px, 1.5fr) minmax(320px, 1fr); 
+      gap: 20px; 
+      flex: 1; 
+      min-height: 500px; 
+    }
+    
     .panel { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
     .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);}
     .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
@@ -60,7 +67,7 @@
     /* FORMS & BUTTONS */
     .form-group { margin-bottom: 16px; }
     label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; }
-    input[type="text"], textarea { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 13px; font-family: inherit; transition: 0.2s; outline: none;}
+    input[type="text"], textarea { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 13px; font-family: inherit; transition: 0.2s; outline: none; box-sizing: border-box;}
     input[type="text"]:focus, textarea:focus { border-color: var(--primary); }
     textarea { resize: vertical; min-height: 80px; }
     
@@ -79,9 +86,9 @@
     .task-item { padding: 16px; border: 1px solid var(--border); background: rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
     .task-item:hover { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.15); }
     .task-item.active-select { border-color: var(--primary); background: rgba(14, 165, 233, 0.05); }
-    .task-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .task-top { display: flex; justify-content: space-between; margin-bottom: 12px; gap: 10px;}
     .task-name { font-weight: 700; color: var(--primary); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;}
-    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap;}
     .badge.running { background: rgba(14, 165, 233, 0.15); color: var(--primary); border: 1px solid rgba(14, 165, 233, 0.2); }
     .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
     .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 8px;}
@@ -95,35 +102,59 @@
     .log-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 15px;}
     .log-line { margin-bottom: 6px; border-bottom: 1px dotted rgba(255,255,255,0.05); padding-bottom: 4px;}
 
-    /* MOBILE / EXTENSION RESPONSIVE */
+    /* =========================================
+       MEDIA QUERIES - ĐẢM BẢO CO GIÃN MƯỢT MÀ
+       ========================================= */
     .bottom-nav { display: none; }
     
-    @media (max-width: 1024px) {
-      .main-grid { grid-template-columns: 1fr 1fr; }
-      .detail-panel { grid-column: span 2; }
+    /* 1. Màn hình Laptop/Desktop nhỏ: Đẩy khối Chi tiết xuống dưới */
+    @media (max-width: 1400px) {
+      .main-grid { grid-template-columns: 1fr 1.2fr; }
+      #tab-overview { grid-column: 1 / -1; min-height: 400px; } 
     }
     
+    /* 2. Màn hình Tablet: Thu nhỏ Sidebar, chuyển Grid thành 1 cột dọc */
+    @media (max-width: 1024px) {
+      .sidebar { width: 80px; }
+      .brand-text, .menu-text, .user-info { display: none; }
+      .brand { justify-content: center; padding: 24px 0; }
+      .brand svg { margin: 0; width: 32px; height: 32px;}
+      .menu-item { justify-content: center; padding: 16px 0; font-size: 20px;}
+      .user-profile { justify-content: center; padding: 24px 0;}
+      
+      .main-grid { grid-template-columns: 1fr; }
+      #tab-create, #tab-list, #tab-overview { grid-column: 1 / -1; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    
+    /* 3. Màn hình Mobile & Extension (< 768px): Bật chế độ Tabs */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .sidebar { display: none; }
       .topbar { padding: 0 16px; height: 60px; }
-      .search-bar { display: none; }
-      .main-grid { grid-template-columns: 1fr; display: flex; flex-direction: column;}
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-      .content-area { padding: 16px; }
+      .search-bar, .time-display { display: none; }
+      .content-area { padding: 16px; gap: 16px; }
       
-      /* Biến sidebar thành Bottom Nav cho Extension */
-      .bottom-nav { display: flex; justify-content: space-around; background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; position: sticky; bottom: 0;}
-      .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); font-size: 10px; font-weight: 600; cursor: pointer;}
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stat-card { padding: 16px; }
+      .stat-value { font-size: 20px; }
+      
+      /* Hủy ép flex để không bóp méo Form/Input */
+      .main-grid { display: flex; flex-direction: column; flex: none; min-height: unset; gap: 12px;}
+      
+      /* Xử lý Tabs */
+      .panel { display: none; border-radius: 12px; flex: none; }
+      .panel.active-tab { display: flex; flex-direction: column; }
+      .panel-body { overflow: visible; } /* Giao lại quyền scroll cho content-area */
+      
+      /* Navbar dưới cùng */
+      .bottom-nav { display: flex; justify-content: space-around; background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; position: sticky; bottom: 0; margin-top: auto;}
+      .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); font-size: 11px; font-weight: 700; cursor: pointer;}
       .nav-item.active { color: var(--primary); }
-      .nav-item svg { width: 20px; height: 20px; }
-      
-      /* Tabs control for Mobile */
-      .panel { display: none; }
-      .panel.active-tab { display: flex; flex: 1;}
+      .nav-item span { font-size: 20px; }
     }
 
-    /* Modal Chọn Thư mục (Dùng chung) */
+    /* Modal Overlay (Dùng chung) */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
     .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
     .modal-header { padding: 16px 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; }
@@ -136,18 +167,18 @@
   <aside class="sidebar">
     <div class="brand">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="rgba(14, 165, 233, 0.2)" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"/></svg>
-      Cloud Cloner
+      <span class="brand-text">Cloud Cloner</span>
     </div>
     <div class="menu">
-      <a class="menu-item active" onclick="switchTab('tab-overview', this)"><span style="font-size: 18px;">📊</span> Tổng quan</a>
-      <a class="menu-item" onclick="switchTab('tab-create', this)"><span style="font-size: 18px;">➕</span> Tạo tác vụ</a>
-      <a class="menu-item" onclick="switchTab('tab-list', this)"><span style="font-size: 18px;">📋</span> Tiến trình</a>
-      <a class="menu-item" onclick="switchTab('tab-history', this)"><span style="font-size: 18px;">🕒</span> Lịch sử</a>
-      <a class="menu-item" style="margin-top: auto;" onclick="alert('Chức năng cài đặt đang hoàn thiện')"><span style="font-size: 18px;">⚙️</span> Cài đặt</a>
+      <a class="menu-item active" onclick="switchTab('tab-overview', this)"><span style="font-size: 18px;">📊</span> <span class="menu-text">Tổng quan</span></a>
+      <a class="menu-item" onclick="switchTab('tab-create', this)"><span style="font-size: 18px;">➕</span> <span class="menu-text">Tạo tác vụ</span></a>
+      <a class="menu-item" onclick="switchTab('tab-list', this)"><span style="font-size: 18px;">📋</span> <span class="menu-text">Tiến trình</span></a>
+      <a class="menu-item" onclick="switchTab('tab-history', this)"><span style="font-size: 18px;">🕒</span> <span class="menu-text">Lịch sử</span></a>
+      <a class="menu-item" style="margin-top: auto;" onclick="alert('Chức năng cài đặt đang hoàn thiện')"><span style="font-size: 18px;">⚙️</span> <span class="menu-text">Cài đặt</span></a>
     </div>
     <div class="user-profile">
       <div class="avatar">U</div>
-      <div style="font-size: 13px; font-weight: 600;">user@gmail.com</div>
+      <div class="user-info" style="font-size: 13px; font-weight: 600;">user@gmail.com</div>
     </div>
   </aside>
 
@@ -174,13 +205,11 @@
     </header>
 
     <div class="content-area">
-      <!-- Lời chào -->
       <div>
         <h1 style="font-size: 24px; color: var(--primary); margin-bottom: 4px;">Xin chào!</h1>
         <p style="color: var(--text-dim);">Sao chép dữ liệu Google Drive nhanh chóng, an toàn.</p>
       </div>
 
-      <!-- Stats -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-title"><span>📁</span> Tổng tác vụ</div>
@@ -202,22 +231,20 @@
         </div>
       </div>
 
-      <!-- Main Layout 3 Cột (Sẽ thành các Tab trên Mobile) -->
       <div class="main-grid">
-        
-        <!-- CỘT 1: TẠO TÁC VỤ -->
+        <!-- TẠO TÁC VỤ -->
         <div class="panel active-tab" id="tab-create">
           <div class="panel-header">➕ Tạo tác vụ mới</div>
           <div class="panel-body">
             <div class="form-group">
               <label>Dán link (Hỗ trợ lọc nhiều link)</label>
-              <textarea id="srcUrl" placeholder="Dán link thư mục, tệp, hoặc nguyên đoạn văn bản vào đây..."></textarea>
+              <textarea id="srcUrl" placeholder="Dán link thư mục, tệp, hoặc nguyên văn bản vào đây..."></textarea>
             </div>
             <div class="form-group">
               <label>Thư mục đích</label>
               <div style="display: flex; gap: 8px;">
                 <input type="text" id="dstUrl" placeholder="https://drive.google.com/drive/folders/..." style="flex:1;">
-                <button class="btn btn-outline" onclick="openFolderModal()" style="padding: 0 12px;" title="Duyệt Drive">📁</button>
+                <button class="btn btn-outline" onclick="openFolderModal()" style="padding: 0 16px;" title="Duyệt Drive">📁 Chọn</button>
               </div>
             </div>
             <div class="form-group">
@@ -232,18 +259,18 @@
           </div>
         </div>
 
-        <!-- CỘT 2: DANH SÁCH TÁC VỤ -->
+        <!-- DANH SÁCH -->
         <div class="panel" id="tab-list">
           <div class="panel-header">
             <span>📋 Danh sách tác vụ</span>
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="loadTasksStatus()">↻</button>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="loadTasksStatus()">↻ Mới nhất</button>
           </div>
           <div class="panel-body" style="padding: 16px;" id="tasksListContainer">
             <div class="empty-card" style="min-height: 100px; padding: 20px;">Đang tải dữ liệu...</div>
           </div>
         </div>
 
-        <!-- CỘT 3: CHI TIẾT & LOG -->
+        <!-- CHI TIẾT -->
         <div class="panel" id="tab-overview">
           <div class="panel-header">
             <span id="detailTitle">Chi tiết tác vụ</span>
@@ -254,7 +281,7 @@
           </div>
         </div>
 
-        <!-- Tab Lịch sử (Fake) -->
+        <!-- LỊCH SỬ -->
         <div class="panel" id="tab-history" style="display: none;">
           <div class="panel-header">🕒 Lịch sử hoạt động</div>
           <div class="panel-body">Chưa có lịch sử cũ.</div>
@@ -264,19 +291,19 @@
     </div>
   </main>
 
-  <!-- BOTTOM NAV (Dành riêng cho Màn hình nhỏ/Extension) -->
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <div class="nav-item" onclick="switchTab('tab-overview', this, true)"><span>📊</span> Tổng quan</div>
     <div class="nav-item active" onclick="switchTab('tab-create', this, true)"><span>➕</span> Tạo task</div>
     <div class="nav-item" onclick="switchTab('tab-list', this, true)"><span>📋</span> Tiến trình</div>
   </nav>
 
-  <!-- Modal Trình Duyệt Thư Mục -->
+  <!-- Modal Trình Duyệt -->
   <div id="folderModal" class="modal-overlay" onclick="closeFolderModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
         <span>🗂️ Trình Duyệt Drive</span>
-        <button class="btn btn-outline" style="padding: 4px 8px; border:none;" onclick="closeFolderModal()">✕</button>
+        <button class="btn btn-outline" style="padding: 4px 10px; border:none;" onclick="closeFolderModal()">✕</button>
       </div>
       <div style="padding: 12px 16px; border-bottom: 1px solid var(--border);" id="folderModalTopBar"></div>
       <div class="modal-body" id="folderListContainer"></div>
@@ -284,7 +311,6 @@
   </div>
 
   <script>
-    // Link API Google Apps Script đã được chèn chuẩn:
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
 
     let globalTasksData = [];
@@ -292,7 +318,6 @@
     let requestBusy = false;
     let selectedTaskId = null;
     
-    // Khởi tạo Đồng hồ
     setInterval(() => {
       const now = new Date();
       document.getElementById('timeStr').innerText = now.toLocaleTimeString('vi-VN', {hour12: false});
@@ -312,7 +337,6 @@
         }
     };
 
-    // LOGIC CHUYỂN TAB (Cho Mobile/Extension)
     function switchTab(tabId, el, isBottomNav = false) {
       if(window.innerWidth > 768 && tabId !== 'tab-history') return; 
 
@@ -322,16 +346,13 @@
 
       document.querySelectorAll('.panel').forEach(p => {
         p.classList.remove('active-tab');
-        if(window.innerWidth <= 768) p.style.display = 'none';
       });
       
       const target = document.getElementById(tabId);
       target.classList.add('active-tab');
-      if(window.innerWidth <= 768) target.style.display = 'flex';
-      else if(tabId === 'tab-history') {
-        document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-        target.style.display = 'flex';
-        target.style.gridColumn = 'span 3';
+      if(tabId === 'tab-history') {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active-tab'));
+        target.classList.add('active-tab');
       }
     }
 
@@ -391,7 +412,6 @@
       }
     }
 
-    /* ==== MODAL THƯ MỤC ==== */
     let folderHistory = [];
     let currentFolderId = '';
     let currentFolderName = 'My Drive';
@@ -409,7 +429,7 @@
       listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--primary);">Đang tải dữ liệu Drive...</div>';
 
       let navHtml = currentFolderId 
-        ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size:12px;" onclick="goBackFolder(event)">🔙 Quay lại</button> <span style="font-weight:700; font-size:13px;">${escapeHtml(currentFolderName)}</span>`
+        ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size:12px;" onclick="goBackFolder(event)">🔙 Quay lại</button> <span style="font-weight:700; font-size:13px; margin-left: 8px;">${escapeHtml(currentFolderName)}</span>`
         : `<span style="font-weight:800; font-size:13px;">📂 MY DRIVE</span>`;
       topBar.innerHTML = navHtml;
 
@@ -425,8 +445,8 @@
           res.folders.forEach(f => {
              let safeName = f.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
              html += `<div class="task-item" style="display:flex; justify-content:space-between; align-items:center; padding: 10px;" onclick="navToFolder('${f.id}', '${safeName}', event)">
-                        <span style="font-weight:600;">📁 ${escapeHtml(f.name)}</span>
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size:11px;" onclick="selectFolder('${f.id}', event); event.stopPropagation();">Chọn</button>
+                        <span style="font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📁 ${escapeHtml(f.name)}</span>
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size:11px; flex-shrink: 0;" onclick="selectFolder('${f.id}', event); event.stopPropagation();">Chọn</button>
                       </div>`;
           });
         }
@@ -438,7 +458,6 @@
     function goBackFolder(e) { if(e) e.stopPropagation(); if(folderHistory.length > 0) { let prev = folderHistory.pop(); currentFolderId = prev.id; currentFolderName = prev.name; } else { currentFolderId = ''; currentFolderName = 'My Drive'; } loadFolderData(); }
     function selectFolder(id, e) { if(e) e.stopPropagation(); document.getElementById('dstUrl').value = 'https://drive.google.com/drive/folders/' + id; closeFolderModal(); }
 
-    /* ==== CORE LOGIC ==== */
     function startNewTask() {
       if (requestBusy) return alert('Hệ thống đang bận...');
       const srcText = document.getElementById('srcUrl').value.trim();
@@ -506,8 +525,8 @@
               <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
               <div class="task-meta">
                 <span>Quét: ${t.totalScanned||0}</span>
-                <span>Thành công: ${t.copiedFiles||0}</span>
-                <span style="color:var(--danger)">Lỗi/Bỏ qua: ${(t.skippedFiles||0) + (t.queuedFiles||0)}</span>
+                <span>Tốt: ${t.copiedFiles||0}</span>
+                <span style="color:var(--danger)">Lỗi: ${(t.skippedFiles||0) + (t.queuedFiles||0)}</span>
               </div>
             </div>`;
         });
