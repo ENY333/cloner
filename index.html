@@ -44,10 +44,10 @@
     .time-date { font-size: 12px; color: var(--text-dim); }
     .time-clock { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
 
-    /* THỐNG KÊ */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    /* THỐNG KÊ - ĐÃ ÉP CỨNG 4 CỘT TRÊN 1 HÀNG */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
     .stat-card { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between;}
-    .stat-title { font-size: 13px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px;}
+    .stat-title { font-size: 13px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
     .stat-value { font-size: 28px; font-weight: 800; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
     
     /* BỐ CỤC CHÍNH (CƠ CHẾ TAB) */
@@ -69,8 +69,8 @@
       overflow: hidden; 
       flex: 1 1 320px; 
     }
-    .panel-list { flex: 1.5 1 380px; min-height: 400px; } /* Cột danh sách luôn dài */
-    .panel-detail { align-self: flex-start; height: max-content; } /* Bản chi tiết THU NHỎ khi trống */
+    .panel-list { flex: 1.5 1 380px; min-height: 400px; }
+    .panel-detail { align-self: flex-start; height: max-content; }
     
     .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);}
     .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
@@ -131,7 +131,11 @@
       .topbar { padding: 0 16px; height: 60px; }
       .search-bar, .time-display { display: none; }
       .content-area { padding: 16px; gap: 16px; flex: 1;}
+      
+      /* Trên Mobile/Extension thì thu lại thành 2x2 cho đỡ bé chữ */
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stat-card { padding: 16px; }
+      .stat-value { font-size: 20px; }
       
       .tab-page { display: none; flex-direction: column; flex: 1; flex-wrap: nowrap; gap: 12px; margin-bottom: 10px;}
       .tab-page.active-page { display: flex !important; }
@@ -196,6 +200,7 @@
         <p style="color: var(--text-dim);">Sao chép dữ liệu Google Drive nhanh chóng, an toàn.</p>
       </div>
 
+      <!-- Thẻ Thống Kê -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-title"><span>📁</span> Tổng tác vụ</div>
@@ -219,7 +224,6 @@
 
       <!-- TAB 1: TỔNG QUAN (Chỉ hiện tạo task và task ĐANG CHẠY) -->
       <div class="tab-page active-page" id="tab-overview">
-        <!-- Panel 1: Tạo Tác vụ -->
         <div class="panel">
           <div class="panel-header">➕ Tạo tác vụ mới</div>
           <div class="panel-body">
@@ -245,7 +249,6 @@
           </div>
         </div>
 
-        <!-- Panel 2: Danh sách Đang Chạy -->
         <div class="panel panel-list">
           <div class="panel-header">
             <span>▶️ Đang tiến hành</span>
@@ -256,7 +259,6 @@
           </div>
         </div>
 
-        <!-- Panel 3: Chi tiết (Sẽ thu nhỏ khi trống) -->
         <div class="panel panel-detail">
           <div class="panel-header">
             <span id="overviewDetailTitle">Chi tiết tác vụ</span>
@@ -280,7 +282,6 @@
           </div>
         </div>
 
-        <!-- Chi tiết cho Tab Lịch sử (Thu nhỏ khi trống) -->
         <div class="panel panel-detail">
           <div class="panel-header">
             <span id="historyDetailTitle">Chi tiết lịch sử</span>
@@ -295,7 +296,7 @@
     </div>
   </main>
 
-  <!-- BOTTOM NAV (Extension/Mobile - 2 nút) -->
+  <!-- BOTTOM NAV (Extension/Mobile) -->
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('tab-overview', this, true)"><span>📊</span> Tổng quan</div>
     <div class="nav-item" onclick="switchTab('tab-history', this, true)"><span>🕒</span> Lịch sử</div>
@@ -348,7 +349,6 @@
       document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active-page'));
       document.getElementById(tabId).classList.add('active-page');
       
-      // Xóa lựa chọn detail khi nhảy qua lại giữa 2 Tab cho gọn
       selectedTaskId = null;
       renderDetail(null);
       document.querySelectorAll('.task-item').forEach(e => e.classList.remove('active-select'));
@@ -467,7 +467,6 @@
       });
     }
 
-    // TÁCH NHIỆM VỤ RÕ RÀNG CHO 2 LIST
     function buildTaskHtml(t) {
         const id = escapeHtml(t.id);
         const name = escapeHtml(t.taskName);
@@ -506,12 +505,10 @@
         document.getElementById('stRun').innerText = runningTasks.length;
         document.getElementById('stDone').innerText = historyTasks.length;
 
-        // Render List Đang chạy (Tổng quan)
         const runContainer = document.getElementById('runningListContainer');
         if (runningTasks.length === 0) runContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px;">Không có tác vụ nào đang chạy.</div>';
         else runContainer.innerHTML = runningTasks.map(buildTaskHtml).join('');
 
-        // Render List Hoàn thành (Lịch sử)
         const histContainer = document.getElementById('historyListContainer');
         if (historyTasks.length === 0) histContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px;">Chưa có tác vụ nào hoàn thành.</div>';
         else histContainer.innerHTML = historyTasks.map(buildTaskHtml).join('');
@@ -535,7 +532,6 @@
       const containerEl = document.getElementById(isHistoryTab ? 'historyDetailContainer' : 'overviewDetailContainer');
       const btnKill = document.getElementById(isHistoryTab ? 'btnKillHistory' : 'btnKillOverview');
       
-      // Clear panel bên kia
       const otherContainer = document.getElementById(isHistoryTab ? 'overviewDetailContainer' : 'historyDetailContainer');
       const otherBtn = document.getElementById(isHistoryTab ? 'btnKillOverview' : 'btnKillHistory');
       otherContainer.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
