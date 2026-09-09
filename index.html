@@ -14,19 +14,17 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; font-size: 14px; }
     
-    /* SCROLLBAR */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-    /* LAYOUT CORE */
     .sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: width 0.3s; z-index: 100;}
     .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     .topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); z-index: 10;}
     .content-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth;}
 
-    /* SIDEBAR */
+    /* SIDEBAR CHỈ CÒN 2 MỤC */
     .brand { padding: 24px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; color: var(--primary); transition: 0.3s; white-space: nowrap; overflow: hidden;}
     .brand svg { filter: drop-shadow(0px 2px 6px rgba(14, 165, 233, 0.4)); flex-shrink: 0;}
     .menu { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
@@ -52,14 +50,16 @@
     .stat-title { font-size: 13px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px;}
     .stat-value { font-size: 28px; font-weight: 800; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
     
-    /* BỐ CỤC CHÍNH (Đã sửa lỗi móp méo) */
-    .main-grid { 
-      display: flex; 
-      flex-wrap: wrap; /* Cho phép rớt dòng khi hết chỗ */
+    /* BỐ CỤC CHÍNH (CƠ CHẾ TAB) */
+    .tab-page { 
+      display: none; 
+      flex-wrap: wrap; 
       gap: 20px; 
       align-content: flex-start;
       flex: 1;
     }
+    .tab-page.active-page { display: flex; }
+    
     .panel { 
       background: var(--bg-card); 
       border-radius: 16px; 
@@ -67,15 +67,15 @@
       display: flex; 
       flex-direction: column; 
       overflow: hidden; 
-      flex: 1 1 320px; /* Định cỡ tối thiểu 320px, tự động co giãn */
-      min-height: 440px; /* BẮT BUỘC: Không bao giờ bị ép lùn xuống */
+      flex: 1 1 320px; 
     }
-    #tab-list { flex: 1.5 1 380px; } /* Cột danh sách ưu tiên to hơn */
+    .panel-list { flex: 1.5 1 380px; min-height: 400px; } /* Cột danh sách luôn dài */
+    .panel-detail { align-self: flex-start; height: max-content; } /* Bản chi tiết THU NHỎ khi trống */
     
     .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);}
     .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-    /* FORMS & BUTTONS */
+    /* FORMS & INPUTS */
     .form-group { margin-bottom: 16px; }
     label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; }
     input[type="text"], textarea { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 13px; font-family: inherit; transition: 0.2s; outline: none; box-sizing: border-box;}
@@ -106,19 +106,16 @@
     .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: width 0.3s; }
     .task-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-top: 8px;}
 
-    /* DETAIL PANEL */
+    /* DETAIL PANEL ROW */
     .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;}
     .detail-label { color: var(--text-dim); }
     .detail-val { font-weight: 600; text-align: right; max-width: 60%; word-break: break-all;}
     .log-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 15px;}
     .log-line { margin-bottom: 6px; border-bottom: 1px dotted rgba(255,255,255,0.05); padding-bottom: 4px;}
 
-    /* =========================================
-       MEDIA QUERIES - ĐẢM BẢO CO GIÃN MƯỢT MÀ
-       ========================================= */
+    /* RESPONSIVE */
     .bottom-nav { display: none; }
     
-    /* Thu hẹp Sidebar khi màn hình cỡ vừa (Tablet/Laptop) */
     @media (max-width: 1024px) {
       .sidebar { width: 80px; }
       .brand-text, .menu-text, .user-info { display: none; }
@@ -128,32 +125,25 @@
       .user-profile { justify-content: center; padding: 24px 0;}
     }
     
-    /* Giao diện Extension & Mobile (< 768px) */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .sidebar { display: none; }
       .topbar { padding: 0 16px; height: 60px; }
       .search-bar, .time-display { display: none; }
       .content-area { padding: 16px; gap: 16px; flex: 1;}
-      
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .stat-card { padding: 16px; }
-      .stat-value { font-size: 20px; }
       
-      .main-grid { display: flex; flex-direction: column; flex: 1; flex-wrap: nowrap; gap: 0; margin-bottom: 10px;}
+      .tab-page { display: none; flex-direction: column; flex: 1; flex-wrap: nowrap; gap: 12px; margin-bottom: 10px;}
+      .tab-page.active-page { display: flex !important; }
+      .panel { flex: none; min-height: unset;}
       
-      /* Biến đổi Panel thành chế độ Tabs ẩn/hiện */
-      .panel { display: none !important; border-radius: 12px; min-height: 480px; flex: 1; }
-      .panel.active-tab { display: flex !important; }
-      
-      /* Thanh Navbar dưới đáy */
       .bottom-nav { display: flex; justify-content: space-around; background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; flex-shrink: 0;}
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); font-size: 11px; font-weight: 700; cursor: pointer;}
       .nav-item.active { color: var(--primary); }
       .nav-item span { font-size: 20px; }
     }
 
-    /* Modal Chọn Thư mục (Dùng chung) */
+    /* Modal Thư mục */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
     .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
     .modal-header { padding: 16px 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; }
@@ -162,7 +152,7 @@
 </head>
 <body>
 
-  <!-- SIDEBAR (Desktop) -->
+  <!-- SIDEBAR (Chỉ còn 2 menu) -->
   <aside class="sidebar">
     <div class="brand">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="rgba(14, 165, 233, 0.2)" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"/></svg>
@@ -170,12 +160,9 @@
     </div>
     <div class="menu">
       <a class="menu-item active" onclick="switchTab('tab-overview', this)"><span style="font-size: 18px;">📊</span> <span class="menu-text">Tổng quan</span></a>
-      <a class="menu-item" onclick="switchTab('tab-create', this)"><span style="font-size: 18px;">➕</span> <span class="menu-text">Tạo tác vụ</span></a>
-      <a class="menu-item" onclick="switchTab('tab-list', this)"><span style="font-size: 18px;">📋</span> <span class="menu-text">Tiến trình</span></a>
       <a class="menu-item" onclick="switchTab('tab-history', this)"><span style="font-size: 18px;">🕒</span> <span class="menu-text">Lịch sử</span></a>
-      <a class="menu-item" style="margin-top: auto;" onclick="alert('Chức năng cài đặt đang hoàn thiện')"><span style="font-size: 18px;">⚙️</span> <span class="menu-text">Cài đặt</span></a>
     </div>
-    <div class="user-profile">
+    <div class="user-profile" style="margin-top: auto;">
       <div class="avatar">U</div>
       <div class="user-info" style="font-size: 13px; font-weight: 600;">user@gmail.com</div>
     </div>
@@ -230,11 +217,10 @@
         </div>
       </div>
 
-      <!-- MAIN GRID: Linh hoạt rớt dòng, không bao giờ ép móp méo -->
-      <div class="main-grid">
-        
-        <!-- Cột 1: TẠO TÁC VỤ -->
-        <div class="panel active-tab" id="tab-create">
+      <!-- TAB 1: TỔNG QUAN (Chỉ hiện tạo task và task ĐANG CHẠY) -->
+      <div class="tab-page active-page" id="tab-overview">
+        <!-- Panel 1: Tạo Tác vụ -->
+        <div class="panel">
           <div class="panel-header">➕ Tạo tác vụ mới</div>
           <div class="panel-body">
             <div class="form-group">
@@ -253,50 +239,66 @@
               <div class="checkbox-group">
                 <label class="checkbox-item"><input type="checkbox" checked disabled> Tự động kiểm tra quyền truy cập</label>
                 <label class="checkbox-item"><input type="checkbox" checked disabled> Bỏ qua file trùng tên (Chống lặp)</label>
-                <label class="checkbox-item"><input type="checkbox" checked disabled> Lọc link tự động từ đoạn văn</label>
               </div>
             </div>
             <button id="btnStart" class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="startNewTask()">▶ BẮT ĐẦU SAO CHÉP</button>
           </div>
         </div>
 
-        <!-- Cột 2: DANH SÁCH -->
-        <div class="panel" id="tab-list">
+        <!-- Panel 2: Danh sách Đang Chạy -->
+        <div class="panel panel-list">
           <div class="panel-header">
-            <span>📋 Danh sách tác vụ</span>
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="loadTasksStatus()">↻ Mới nhất</button>
+            <span>▶️ Đang tiến hành</span>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="loadTasksStatus()">↻ Làm mới</button>
           </div>
-          <div class="panel-body" style="padding: 16px;" id="tasksListContainer">
+          <div class="panel-body" style="padding: 16px;" id="runningListContainer">
             <div class="empty-card" style="min-height: 100px; padding: 20px;">Đang tải dữ liệu...</div>
           </div>
         </div>
 
-        <!-- Cột 3: CHI TIẾT -->
-        <div class="panel" id="tab-overview">
+        <!-- Panel 3: Chi tiết (Sẽ thu nhỏ khi trống) -->
+        <div class="panel panel-detail">
           <div class="panel-header">
-            <span id="detailTitle">Chi tiết tác vụ</span>
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillTask" style="display:none;">Hủy tác vụ</button>
+            <span id="overviewDetailTitle">Chi tiết tác vụ</span>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillOverview" style="display:none;">Hủy tác vụ</button>
           </div>
-          <div class="panel-body" id="detailContainer">
-            <div style="text-align: center; color: var(--text-dim); margin-top: 50px;">Bấm vào một tác vụ ở danh sách để xem chi tiết.</div>
+          <div class="panel-body" id="overviewDetailContainer" style="padding: 16px;">
+            <div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>
           </div>
         </div>
-
-        <!-- BẢNG LỊCH SỬ (Ẩn đi theo mặc định trên PC) -->
-        <div class="panel" id="tab-history" style="display: none; flex: 1 1 100%;">
-          <div class="panel-header">🕒 Lịch sử hoạt động</div>
-          <div class="panel-body">Hệ thống ghi nhận log hoạt động sẽ được cập nhật ở phiên bản tiếp theo.</div>
-        </div>
-
       </div>
+
+      <!-- TAB 2: LỊCH SỬ (Chỉ hiện task HOÀN THÀNH) -->
+      <div class="tab-page" id="tab-history">
+        <div class="panel panel-list">
+          <div class="panel-header">
+            <span>✅ Đã Hoàn Thành & Lịch Sử</span>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="loadTasksStatus()">↻ Làm mới</button>
+          </div>
+          <div class="panel-body" style="padding: 16px;" id="historyListContainer">
+            <div class="empty-card" style="min-height: 100px; padding: 20px;">Chưa có tác vụ nào hoàn thành.</div>
+          </div>
+        </div>
+
+        <!-- Chi tiết cho Tab Lịch sử (Thu nhỏ khi trống) -->
+        <div class="panel panel-detail">
+          <div class="panel-header">
+            <span id="historyDetailTitle">Chi tiết lịch sử</span>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillHistory" style="display:none;">Xóa bản ghi</button>
+          </div>
+          <div class="panel-body" id="historyDetailContainer" style="padding: 16px;">
+            <div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 
-  <!-- BOTTOM NAV (Cho Màn hình nhỏ/Extension) -->
+  <!-- BOTTOM NAV (Extension/Mobile - 2 nút) -->
   <nav class="bottom-nav">
-    <div class="nav-item" onclick="switchTab('tab-overview', this, true)"><span>📊</span> Tổng quan</div>
-    <div class="nav-item active" onclick="switchTab('tab-create', this, true)"><span>➕</span> Tạo task</div>
-    <div class="nav-item" onclick="switchTab('tab-list', this, true)"><span>📋</span> Tiến trình</div>
+    <div class="nav-item active" onclick="switchTab('tab-overview', this, true)"><span>📊</span> Tổng quan</div>
+    <div class="nav-item" onclick="switchTab('tab-history', this, true)"><span>🕒</span> Lịch sử</div>
   </nav>
 
   <!-- Modal Trình Duyệt -->
@@ -339,30 +341,17 @@
     };
 
     function switchTab(tabId, el, isBottomNav = false) {
-      // 1. Cập nhật nút active
       const items = isBottomNav ? document.querySelectorAll('.nav-item') : document.querySelectorAll('.menu-item');
       items.forEach(i => i.classList.remove('active'));
       if(el) el.classList.add('active');
 
-      // 2. Logic điều hướng thông minh
-      if(window.innerWidth > 768) {
-         // MÀN HÌNH LỚN (PC/Tablet): Cuộn tới khối, thay vì ẩn khối
-         if (tabId === 'tab-history') {
-            document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-            document.getElementById('tab-history').style.display = 'flex';
-         } else {
-            // Đảm bảo 3 khối hiển thị lại nếu đang từ Lịch sử sang
-            document.querySelectorAll('.panel').forEach(p => p.style.display = 'flex');
-            document.getElementById('tab-history').style.display = 'none';
-            // Cuộn chuột mượt tới khu vực đó
-            const target = document.getElementById(tabId);
-            if(target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
-         }
-      } else {
-         // EXTENSION / MOBILE (< 768px): Cơ chế Tabs (Ẩn hết, chỉ hiện 1 khối)
-         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active-tab'));
-         document.getElementById(tabId).classList.add('active-tab');
-      }
+      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active-page'));
+      document.getElementById(tabId).classList.add('active-page');
+      
+      // Xóa lựa chọn detail khi nhảy qua lại giữa 2 Tab cho gọn
+      selectedTaskId = null;
+      renderDetail(null);
+      document.querySelectorAll('.task-item').forEach(e => e.classList.remove('active-select'));
     }
 
     function escapeHtml(value) {
@@ -377,9 +366,7 @@
       let finished = false;
       const query = Object.keys(params || {}).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
       const finish = function() {
-        if (finished) return;
-        finished = true;
-        clearTimeout(timer);
+        if (finished) return; finished = true; clearTimeout(timer);
         try { delete window[cb]; } catch(e) {}
         if (script.parentNode) script.parentNode.removeChild(script);
       };
@@ -388,9 +375,7 @@
       script.src = GAS_URL + '?action=' + encodeURIComponent(action) + (query ? '&' + query : '') + '&callback=' + cb;
       document.body.appendChild(script);
       const timer = setTimeout(function() {
-        if (finished) return;
-        finish();
-        callback(new Error('Máy chủ phản hồi lâu.'), null);
+        if (finished) return; finish(); callback(new Error('Máy chủ phản hồi lâu.'), null);
       }, timeoutMs || 30000);
     }
 
@@ -400,7 +385,6 @@
           const usedGB = (res.used / (1024*1024*1024)).toFixed(2);
           const limitGB = (res.limit / (1024*1024*1024)).toFixed(2);
           const pct = (res.limit > 0) ? Math.min(100, Math.round((res.used / res.limit) * 100)) : 0;
-          
           document.getElementById('storageText').innerText = `${usedGB} / ${limitGB} GB`;
           const bar = document.getElementById('storageBar');
           bar.style.width = pct + '%';
@@ -421,17 +405,9 @@
       }
     }
 
-    let folderHistory = [];
-    let currentFolderId = '';
-    let currentFolderName = 'My Drive';
-
-    function openFolderModal() {
-      document.getElementById('folderModal').style.display = 'flex';
-      folderHistory = []; currentFolderId = ''; currentFolderName = 'My Drive';
-      loadFolderData();
-    }
+    let folderHistory = []; let currentFolderId = ''; let currentFolderName = 'My Drive';
+    function openFolderModal() { document.getElementById('folderModal').style.display = 'flex'; folderHistory = []; currentFolderId = ''; currentFolderName = 'My Drive'; loadFolderData(); }
     function closeFolderModal() { document.getElementById('folderModal').style.display = 'none'; }
-
     function loadFolderData() {
       const topBar = document.getElementById('folderModalTopBar');
       const listContainer = document.getElementById('folderListContainer');
@@ -444,11 +420,8 @@
 
       jsonpRequest('getFolders', { parentId: currentFolderId }, function(err, res) {
         if (err || !res.success) { listContainer.innerHTML = '<div style="color:var(--danger); text-align:center;">Lỗi tải thư mục</div>'; return; }
-        
         let html = '';
-        if (currentFolderId) {
-            html += `<button class="btn btn-primary" style="width:100%; margin-bottom:12px; background: rgba(16,185,129,0.2); color:var(--success);" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC NÀY</button>`;
-        }
+        if (currentFolderId) { html += `<button class="btn btn-primary" style="width:100%; margin-bottom:12px; background: rgba(16,185,129,0.2); color:var(--success);" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC NÀY</button>`; }
         if (!res.folders || res.folders.length === 0) { html += '<div style="text-align:center; color:var(--text-dim);">Thư mục trống.</div>'; } 
         else {
           res.folders.forEach(f => {
@@ -462,7 +435,6 @@
         listContainer.innerHTML = html;
       });
     }
-
     function navToFolder(id, name, e) { if(e) e.stopPropagation(); folderHistory.push({id: currentFolderId, name: currentFolderName}); currentFolderId = id; currentFolderName = name; loadFolderData(); }
     function goBackFolder(e) { if(e) e.stopPropagation(); if(folderHistory.length > 0) { let prev = folderHistory.pop(); currentFolderId = prev.id; currentFolderName = prev.name; } else { currentFolderId = ''; currentFolderName = 'My Drive'; } loadFolderData(); }
     function selectFolder(id, e) { if(e) e.stopPropagation(); document.getElementById('dstUrl').value = 'https://drive.google.com/drive/folders/' + id; closeFolderModal(); }
@@ -490,56 +462,59 @@
           if (res && res.success) {
             document.getElementById('srcUrl').value = ''; document.getElementById('dstUrl').value = '';
             loadTasksStatus(); checkStorage();
-            if(window.innerWidth <= 768) switchTab('tab-list', document.querySelectorAll('.nav-item')[2], true); 
           } else { alert('Lỗi: ' + (res ? res.error : 'Unknown')); }
         }); 
       });
     }
 
+    // TÁCH NHIỆM VỤ RÕ RÀNG CHO 2 LIST
+    function buildTaskHtml(t) {
+        const id = escapeHtml(t.id);
+        const name = escapeHtml(t.taskName);
+        const isDone = t.completed;
+        const status = isDone ? 'Hoàn thành' : 'Đang chạy';
+        const badgeClass = isDone ? 'success' : 'running';
+        const pct = Math.max(0, Math.min(100, Number(t.progressPercent) || 0));
+        const isActive = (id === selectedTaskId) ? 'active-select' : '';
+        
+        return `
+          <div class="task-item ${isActive}" onclick="selectTask('${id}')">
+            <div class="task-top">
+              <div class="task-name" title="${name}">${name}</div>
+              <div class="badge ${badgeClass}">${status}</div>
+            </div>
+            <div style="font-size:12px; color:var(--text-dim);">${pct}% - ${escapeHtml(t.lastFile || '')}</div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+            <div class="task-meta">
+              <span>Quét: ${t.totalScanned||0}</span>
+              <span>Tốt: ${t.copiedFiles||0}</span>
+              <span style="color:var(--danger)">Lỗi: ${(t.skippedFiles||0) + (t.queuedFiles||0)}</span>
+            </div>
+          </div>`;
+    }
+
     function loadTasksStatus() {
       jsonpRequest('list', {}, function(err, tasks) {
-        const container = document.getElementById('tasksListContainer');
         if (err) { setApiStatus(false); return; }
-        
         setApiStatus(true);
         globalTasksData = tasks || [];
         
+        const runningTasks = globalTasksData.filter(t => !t.completed);
+        const historyTasks = globalTasksData.filter(t => t.completed);
+
         document.getElementById('stTotal').innerText = tasks.length;
-        document.getElementById('stRun').innerText = tasks.filter(t => !t.completed).length;
-        document.getElementById('stDone').innerText = tasks.filter(t => t.completed).length;
+        document.getElementById('stRun').innerText = runningTasks.length;
+        document.getElementById('stDone').innerText = historyTasks.length;
 
-        if (tasks.length === 0) {
-          container.innerHTML = '<div class="empty-card">Không có tác vụ nào.<br>Tạo mới ở cột bên cạnh.</div>';
-          if(selectedTaskId) { renderDetail(null); selectedTaskId = null; }
-          return;
-        }
+        // Render List Đang chạy (Tổng quan)
+        const runContainer = document.getElementById('runningListContainer');
+        if (runningTasks.length === 0) runContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px;">Không có tác vụ nào đang chạy.</div>';
+        else runContainer.innerHTML = runningTasks.map(buildTaskHtml).join('');
 
-        let html = '';
-        tasks.forEach(t => {
-          const id = escapeHtml(t.id);
-          const name = escapeHtml(t.taskName);
-          const isDone = t.completed;
-          const status = isDone ? 'Hoàn thành' : 'Đang chạy';
-          const badgeClass = isDone ? 'success' : 'running';
-          const pct = Math.max(0, Math.min(100, Number(t.progressPercent) || 0));
-          const isActive = (id === selectedTaskId) ? 'active-select' : '';
-          
-          html += `
-            <div class="task-item ${isActive}" onclick="selectTask('${id}')">
-              <div class="task-top">
-                <div class="task-name" title="${name}">${name}</div>
-                <div class="badge ${badgeClass}">${status}</div>
-              </div>
-              <div style="font-size:12px; color:var(--text-dim);">${pct}% - ${escapeHtml(t.lastFile || '')}</div>
-              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
-              <div class="task-meta">
-                <span>Quét: ${t.totalScanned||0}</span>
-                <span>Tốt: ${t.copiedFiles||0}</span>
-                <span style="color:var(--danger)">Lỗi: ${(t.skippedFiles||0) + (t.queuedFiles||0)}</span>
-              </div>
-            </div>`;
-        });
-        container.innerHTML = html;
+        // Render List Hoàn thành (Lịch sử)
+        const histContainer = document.getElementById('historyListContainer');
+        if (historyTasks.length === 0) histContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px;">Chưa có tác vụ nào hoàn thành.</div>';
+        else histContainer.innerHTML = historyTasks.map(buildTaskHtml).join('');
         
         if(selectedTaskId) renderDetail(globalTasksData.find(t => t.id === selectedTaskId));
       });
@@ -551,27 +526,36 @@
       document.querySelectorAll('.task-item').forEach(el => el.classList.remove('active-select'));
       event.currentTarget.classList.add('active-select');
       renderDetail(task);
-      if(window.innerWidth <= 768) switchTab('tab-overview', document.querySelectorAll('.nav-item')[0], true);
     }
 
     function renderDetail(task) {
-      const container = document.getElementById('detailContainer');
-      const btnKill = document.getElementById('btnKillTask');
+      const isHistoryTab = document.getElementById('tab-history').classList.contains('active-page');
       
+      const titleEl = document.getElementById(isHistoryTab ? 'historyDetailTitle' : 'overviewDetailTitle');
+      const containerEl = document.getElementById(isHistoryTab ? 'historyDetailContainer' : 'overviewDetailContainer');
+      const btnKill = document.getElementById(isHistoryTab ? 'btnKillHistory' : 'btnKillOverview');
+      
+      // Clear panel bên kia
+      const otherContainer = document.getElementById(isHistoryTab ? 'overviewDetailContainer' : 'historyDetailContainer');
+      const otherBtn = document.getElementById(isHistoryTab ? 'btnKillOverview' : 'btnKillHistory');
+      otherContainer.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
+      otherBtn.style.display = 'none';
+
       if(!task) {
-        container.innerHTML = '<div style="text-align:center; color:var(--text-dim); margin-top:50px;">Chọn 1 tác vụ để xem chi tiết.</div>';
+        containerEl.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
         btnKill.style.display = 'none';
-        document.getElementById('detailTitle').innerText = "Chi tiết tác vụ";
+        titleEl.innerText = isHistoryTab ? "Chi tiết lịch sử" : "Chi tiết tác vụ";
         return;
       }
 
-      document.getElementById('detailTitle').innerText = task.taskName;
+      titleEl.innerText = task.taskName;
       btnKill.style.display = 'block';
+      btnKill.innerText = isHistoryTab ? "Xóa bản ghi" : "Hủy tác vụ";
       
       let logs = (task.scannedList || []).slice(-10).reverse().map(l => `<div class="log-line">[${new Date().toLocaleTimeString()}] Đã quét: ${escapeHtml(l.name)}</div>`).join('');
       if(!logs) logs = "Hệ thống đang khởi tạo log...";
 
-      container.innerHTML = `
+      containerEl.innerHTML = `
         <div class="detail-row"><span class="detail-label">ID Tác vụ</span><span class="detail-val" style="font-family:monospace; color:var(--primary);">${task.id}</span></div>
         <div class="detail-row"><span class="detail-label">Trạng thái</span><span class="detail-val ${task.completed ? 'text-success' : 'text-primary'}">${task.statusMsg}</span></div>
         <div class="detail-row"><span class="detail-label">Tiến độ tổng</span><span class="detail-val">${task.progressPercent}%</span></div>
@@ -586,10 +570,13 @@
     }
 
     function killSelectedTask() {
-      if(!selectedTaskId || !confirm('Xác nhận hủy tác vụ này? Dữ liệu đã copy sẽ không bị mất.')) return;
+      const isHistory = globalTasksData.find(t => t.id === selectedTaskId)?.completed;
+      const msg = isHistory ? 'Xóa bản ghi lịch sử này?' : 'Xác nhận hủy tác vụ đang chạy? Dữ liệu đã copy sẽ không bị mất.';
+      if(!selectedTaskId || !confirm(msg)) return;
       jsonpRequest('kill', {id: selectedTaskId}, function(err) {
         if(err) alert(err.message);
         selectedTaskId = null;
+        renderDetail(null);
         loadTasksStatus();
       });
     }
