@@ -10,119 +10,105 @@
     :root { --primary: #38bdf8; --card-border: rgba(255, 255, 255, 0.08); --card-bg: rgba(13, 19, 33, 0.95); --text: #f8fafc; --text-dim: #94a3b8; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #060913; color: var(--text); width: 100vw; min-height: 100vh; overflow-x: hidden; }
-    
-    .btn-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn-submit:hover { box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); }
-    .btn-submit:disabled { opacity: .65; cursor: wait; }
-    
+    .btn-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+    .btn-submit:hover { box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35); transform: translateY(-2px);}
+    .btn-submit:disabled { opacity: .65; cursor: wait; transform: none; box-shadow: none;}
     .container { width: 100%; min-height: 100vh; padding: 25px 4%; display: flex; flex-direction: column; }
-    .app-header { display: flex; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
-    
+    .app-header { display: flex; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;}
     .backend-badge { display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.18); color:#4ade80; transition: 0.3s;}
     .backend-badge.offline { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.18); color:#f87171; }
     .backend-badge .api-dot { margin:0; }
-    
-    .form-help { color:var(--text-dim); font-size:12px; margin-top:14px; line-height:1.5; }
-    .task-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .form-help { color:var(--text-dim); font-size:12px; margin-top:16px; line-height:1.5; text-align: center;}
+    .task-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
     .toolbar-spacer { flex:1; }
-    
-    .btn-secondary { background:rgba(255,255,255,.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; transition:0.2s; display: flex; align-items: center; justify-content: center;}
-    .btn-secondary:hover { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,0.25); color: #fff; }
-    
+    .btn-secondary { background:rgba(255,255,255,.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); padding:9px 16px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:0.2s; display: flex; align-items: center; justify-content: center;}
+    .btn-secondary:hover { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,0.3); color: #fff; }
     .empty-card { min-height:190px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:30px; }
     .empty-icon { font-size:54px; opacity:.75; margin-bottom:14px; }
     .empty-title { font-size:17px; font-weight:800; margin-bottom:8px; }
     .empty-subtitle { color:var(--text-dim); font-size:13px; line-height:1.5; }
-    .footer-note { text-align:center; color:var(--text-dim); font-size:12px; margin:26px 0 8px; }
-    
-    .app-title { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--primary); flex-grow: 1;}
+    .app-title { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 800; color: var(--primary); flex-grow: 1;}
     .app-title svg { filter: drop-shadow(0px 2px 6px rgba(56, 189, 248, 0.4)); margin-right: 4px; }
-    
-    .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .form-group { margin-bottom: 14px; position: relative;}
-    label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
-    
-    /* Chuyển ô nhập thành hộp to cho phép dán nguyên đoạn Zalo vào */
-    input[type="text"], textarea { width: 100%; padding: 14px 16px; background: rgba(8, 12, 22, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: inherit; }
-    input[type="text"]:focus, textarea:focus { border-color: var(--primary); }
-    textarea { resize: vertical; min-height: 80px; }
-    
-    .folder-item-wrap { display:flex; justify-content:space-between; align-items:center; border-radius: 6px; transition: 0.2s; padding: 2px; }
+    .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; margin-bottom: 25px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .step-badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+    .form-group { margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03);}
+    label { display: block; font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
+    input[type="text"], textarea { width: 100%; padding: 14px 16px; background: rgba(6, 9, 19, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: inherit; transition: 0.2s;}
+    input[type="text"]:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
+    textarea { resize: vertical; min-height: 90px; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
+    .folder-modal-content { background: #0d1321; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; width: 100%; max-width: 600px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
+    .folder-item-wrap { display:flex; justify-content:space-between; align-items:center; border-radius: 8px; transition: 0.2s; padding: 4px; margin-bottom: 4px;}
     .folder-item-wrap:hover { background: rgba(56, 189, 248, 0.1); }
-    .folder-item { flex:1; padding: 8px 10px; font-size: 13px; color: #e2e8f0; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .folder-item { flex:1; padding: 10px 12px; font-size: 14px; font-weight: 600; color: #e2e8f0; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px;}
     .folder-item-wrap:hover .folder-item { color: #38bdf8; }
-    .btn-select-folder { background:rgba(56,189,248,0.2); color:#38bdf8; border:1px solid #38bdf8; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold; margin-right:4px; transition:0.2s; }
-    .btn-select-folder:hover { background:#38bdf8; color:#060913; }
-    
+    .btn-select-folder { background:rgba(56,189,248,0.2); color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:800; margin-right:4px; transition:0.2s; }
+    .btn-select-folder:hover { background:#38bdf8; color:#060913; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);}
     .active-tasks-section { margin-top: 10px; padding-bottom: 30px; }
-    .section-title { font-size: 13px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .section-title { font-size: 15px; font-weight: 800; color: #cbd5e1; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .task-item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
     .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .task-name { font-size: 14px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
-    .task-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); white-space: nowrap; }
-    .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+    .task-name { font-size: 15px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+    .task-status { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); white-space: nowrap; }
+    .current-file-box { background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
     .current-file-box span { color: #e2e8f0; font-weight: 600; }
-    .progress-wrap { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.05); border-radius: 8px; padding: 9px 10px; }
-    .progress-label { display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
-    .progress-track { width:100%; height:7px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
+    .progress-wrap { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.05); border-radius: 10px; padding: 12px; }
+    .progress-label { display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); margin-bottom:8px; font-weight:700; }
+    .progress-track { width:100%; height:8px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
     .progress-bar { height:100%; border-radius:99px; background:linear-gradient(90deg,#0284c7,#38bdf8); transition:width .35s ease; }
-    .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .metric-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); padding: 10px 6px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .metric-box:hover { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); }
-    .metric-label { font-size: 10.5px; color: var(--text-dim); margin-bottom: 4px; font-weight: 600; }
-    .metric-value { font-size: 13px; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-    .btn-kill { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
-    .btn-kill:hover { background: rgba(239, 68, 68, 0.3); }
-    
-    #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(6, 9, 19, 0.9); z-index: 9999; padding: 20px; align-items: center; justify-content: center;}
-    .modal-content { background: #0d1321; border: 1px solid var(--card-border); border-radius: 12px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-    .modal-header { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; color: var(--primary); }
-    .modal-close { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: var(--text-dim); font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; }
-    .modal-body { padding: 20px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; flex-grow: 1; }
-    .modal-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 3px solid var(--primary); border-radius: 6px; padding: 12px; margin-bottom: 10px; word-break: break-all; }
-    .modal-item-name { color: #f8fafc; font-weight: 600; margin-bottom: 4px; }
-    .modal-item-desc { color: var(--text-dim); font-size: 11px; }
-    .empty-msg { text-align: center; color: var(--text-dim); padding: 40px; font-size: 13px; }
-    
-    .api-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#64748b; margin-right:5px; transition: 0.3s; }
-    .api-dot.online { background:#22c55e; }
-    .api-dot.offline { background:#ef4444; }
-
-    .storage-box { display:none; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 14px; margin-top: 14px; }
-    .storage-header { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; }
+    .task-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .metric-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); padding: 12px 6px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+    .metric-box:hover { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); transform: translateY(-2px);}
+    .metric-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; }
+    .metric-value { font-size: 15px; color: #fff; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .btn-kill { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; margin-top: 4px;}
+    .btn-kill:hover { background: rgba(239, 68, 68, 0.25); color: #fff;}
+    .modal-content { background: #0d1321; border: 1px solid var(--card-border); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .modal-header { padding: 20px 24px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 17px; color: var(--primary); }
+    .modal-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s;}
+    .modal-close:hover { background: rgba(239, 68, 68, 0.2); color: #fff; border-color: rgba(239, 68, 68, 0.4);}
+    .modal-body { padding: 20px 24px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; flex-grow: 1; }
+    .modal-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 4px solid var(--primary); border-radius: 8px; padding: 14px; margin-bottom: 12px; word-break: break-all; }
+    .modal-item-name { color: #f8fafc; font-weight: 700; margin-bottom: 6px; }
+    .modal-item-desc { color: var(--text-dim); font-size: 12px; }
+    .empty-msg { text-align: center; color: var(--text-dim); padding: 40px; font-size: 14px; font-weight: 600;}
+    .api-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#64748b; margin-right:5px; transition: 0.3s; }
+    .api-dot.online { background:#22c55e; box-shadow: 0 0 8px #22c55e;}
+    .api-dot.offline { background:#ef4444; box-shadow: 0 0 8px #ef4444;}
+    .storage-box { display:none; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px 18px; margin-top: 20px; }
+    .storage-header { display: flex; justify-content: space-between; font-size: 13px; color: #cbd5e1; margin-bottom: 10px; font-weight: 700; }
     .storage-value { color: #fff; font-family: 'JetBrains Mono', monospace; }
   </style>
 </head>
 <body>
-  
   <div class="container" id="mainApp">
     <div class="app-header">
       <div class="app-title">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" style="margin-right: 8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" style="margin-right: 10px;">
           <path fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
           <polygon fill="#0ea5e9" points="13 2 9 13 12 13 11 22 15 11 12 11 13 2"></polygon>
         </svg>
         Drive Cloud Cloner
       </div>
-      <div style="display:flex; align-items:center; gap: 8px;">
+      <div style="display:flex; align-items:center; gap: 10px;">
         <div class="backend-badge" id="apiStatus"><span class="api-dot" id="apiDot"></span><span id="apiStatusText">Đang tải...</span></div>
-        <button class="btn-secondary" onclick="window.open(window.location.href, '_blank')" title="Mở trang web ở Tab mới để không bị đóng">📌 Mở Tab Gốc</button>
+        <button class="btn-secondary" onclick="window.open(window.location.href, '_blank')" title="Mở trang web ở Tab mới để không bị đóng">📌 Tab Mới</button>
       </div>
     </div>
     
     <div class="form-box">
       <div class="form-group">
-        <label>Đoạn văn chứa link Nguồn (Tự động lọc nhiều link cùng lúc):</label>
-        <textarea id="srcUrl" placeholder="Dán 1 link hoặc nguyên đoạn văn chứa nhiều link Drive vào đây..."></textarea>
+        <div class="step-badge">Bước 1: Link Nguồn</div>
+        <label>Dán link gốc hoặc nguyên đoạn văn chứa nhiều link:</label>
+        <textarea id="srcUrl" placeholder="Ví dụ: Anh em tải tài liệu tại https://drive.google.com/... nhé!"></textarea>
       </div>
       
-      <div class="form-group" style="position: relative;">
-        <label>Link Thư mục đích:</label>
-        <div style="display: flex; gap: 8px;">
+      <div class="form-group">
+        <div class="step-badge">Bước 2: Nơi Lưu Trữ (Đích)</div>
+        <label>Đường dẫn thư mục sẽ nhận file:</label>
+        <div style="display: flex; gap: 10px;">
           <input type="text" id="dstUrl" placeholder="https://drive.google.com/drive/folders/...">
-          <button id="btnBrowseDst" class="btn-secondary" onclick="toggleFolderPicker(event)" title="Duyệt cây thư mục từ Drive" style="padding: 10px 15px; font-size: 16px;">▼</button>
-        </div>
-        <div id="folderDropdown" style="display:none; position:absolute; top: 100%; right:0; width:100%; max-height:280px; overflow-y:auto; background:#0d1321; border:1px solid rgba(255,255,255,0.15); z-index:100; border-radius:8px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-top: 4px;">
+          <button id="btnBrowseDst" class="btn-secondary" onclick="openFolderModal()" style="padding: 0 20px; font-size: 16px;">📁 Chọn</button>
         </div>
       </div>
       
@@ -133,15 +119,13 @@
           <span>☁️ Dung lượng Google Drive</span>
           <span class="storage-value" id="storageText">Đang quét...</span>
         </div>
-        <div class="progress-track" style="height: 6px;"><div class="progress-bar" id="storageBar" style="width: 0%; background: #38bdf8;"></div></div>
+        <div class="progress-track"><div class="progress-bar" id="storageBar" style="width: 0%; background: #38bdf8;"></div></div>
       </div>
-      
-      <div class="form-help" style="margin-top: 14px;">ⓘ Hỗ trợ sao chép nhiều thư mục, tệp lẻ cùng lúc. Bạn có thể paste nguyên tin nhắn Zalo vào ô trên.</div>
     </div>
     
     <div class="active-tasks-section">
       <div class="task-toolbar">
-        <div class="section-title" id="sectionTitle" style="margin:0">TIẾN TRÌNH ĐANG CHẠY NGẦM</div>
+        <div class="section-title" id="sectionTitle">TIẾN TRÌNH ĐANG CHẠY NGẦM</div>
         <div class="toolbar-spacer"></div>
         <button class="btn-secondary" onclick="loadTasksStatus()">↻ Làm mới</button>
       </div>
@@ -149,21 +133,32 @@
     </div>
   </div>
 
-  <div id="infoModal" onclick="closeModal()">
+  <div id="infoModal" class="modal-overlay" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header" id="modalTitle">Chi tiết thông tin</div>
       <div class="modal-body" id="modalListContainer"></div>
     </div>
   </div>
+
+  <div id="folderModal" class="modal-overlay" onclick="closeFolderModal()">
+    <div class="folder-modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span style="display: flex; align-items: center; gap: 8px;">🗂️ Trình Duyệt Drive</span>
+        <button class="modal-close" onclick="closeFolderModal()">Đóng ✕</button>
+      </div>
+      <div id="folderModalTopBar" style="padding: 16px 24px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center;">
+      </div>
+      <div class="modal-body" id="folderListContainer" style="padding: 16px 24px;">
+      </div>
+    </div>
+  </div>
   
   <script>
-    // ⚠️⚠️ BẠN BẮT BUỘC PHẢI THAY LINK APPS SCRIPT CỦA BẠN VÀO ĐÂY:
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzJhIrQcuraszeEvQ7qGkUEB7rBMOcWil5Fg8Xf4Mgojla0fhb6-SaanaZFaSTvUCGB/exec";
     
     let globalTasksData = [];
     let pollingStarted = false;
     let requestBusy = false;
-    
     let folderHistory = [];
     let currentFolderId = '';
     let currentFolderName = 'My Drive';
@@ -171,10 +166,8 @@
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const autoSrc = urlParams.get('autoSrc');
-        if (autoSrc) {
-            document.getElementById('srcUrl').value = autoSrc;
-        }
-
+        if (autoSrc) document.getElementById('srcUrl').value = autoSrc;
+        
         loadTasksStatus();
         checkStorage(); 
         if (!pollingStarted) {
@@ -202,13 +195,13 @@
         if (script.parentNode) script.parentNode.removeChild(script);
       };
       window[cb] = function(res) { finish(); callback(null, res); };
-      script.onerror = function() { finish(); callback(new Error('Không thể kết nối Google Apps Script.'), null); };
+      script.onerror = function() { finish(); callback(new Error('Lỗi kết nối.'), null); };
       script.src = GAS_URL + '?action=' + encodeURIComponent(action) + (query ? '&' + query : '') + '&callback=' + cb;
       document.body.appendChild(script);
       const timer = setTimeout(function() {
         if (finished) return;
         finish();
-        callback(new Error('Máy chủ phản hồi quá lâu.'), null);
+        callback(new Error('Máy chủ phản hồi lâu.'), null);
       }, timeoutMs || 30000);
     }
 
@@ -218,13 +211,10 @@
           const usedGB = (res.used / (1024*1024*1024)).toFixed(2);
           const limitGB = (res.limit / (1024*1024*1024)).toFixed(2);
           const pct = (res.limit > 0) ? Math.min(100, Math.round((res.used / res.limit) * 100)) : 0;
-          
           document.getElementById('storageBox').style.display = 'block';
-          document.getElementById('storageText').innerText = `${usedGB} GB / ${limitGB} GB (${pct}%)`;
-          
+          document.getElementById('storageText').innerText = `${usedGB} / ${limitGB} GB (${pct}%)`;
           const bar = document.getElementById('storageBar');
           bar.style.width = pct + '%';
-          
           if (pct > 90) bar.style.background = '#ef4444'; 
           else if (pct > 75) bar.style.background = '#f59e0b'; 
           else bar.style.background = '#22c55e'; 
@@ -238,64 +228,65 @@
       if (!dot || !text) return;
       if (isOnline) {
         dot.className = 'api-dot online';
-        text.innerText = 'Backend online';
+        text.innerText = 'Máy chủ Online';
       } else {
         dot.className = 'api-dot offline';
-        text.innerText = 'Backend lỗi';
+        text.innerText = 'Mất kết nối';
       }
     }
 
-    function toggleFolderPicker(event) {
-      if (event) event.stopPropagation();
-      const dropdown = document.getElementById('folderDropdown');
-      if (dropdown.style.display === 'block') {
-        dropdown.style.display = 'none';
+    function openFolderModal() {
+      document.getElementById('folderModal').style.display = 'flex';
+      folderHistory = [];
+      currentFolderId = '';
+      currentFolderName = 'My Drive';
+      loadFolderData();
+    }
+
+    function closeFolderModal() {
+      document.getElementById('folderModal').style.display = 'none';
+    }
+
+    function loadFolderData() {
+      const topBar = document.getElementById('folderModalTopBar');
+      const listContainer = document.getElementById('folderListContainer');
+      listContainer.innerHTML = '<div style="padding:40px; color:#38bdf8; font-size:14px; text-align:center; font-weight:600;">🔄 Đang tải dữ liệu từ Google Drive...</div>';
+
+      let navHtml = '';
+      if (currentFolderId) {
+        navHtml += `<button class="btn-secondary" onclick="goBackFolder(event)" style="padding: 6px 12px; font-size: 12px;">🔙 Trở lại</button>`;
+        navHtml += `<div style="font-size:13px; color:#94a3b8; font-weight:700; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(currentFolderName)}">📂 ${escapeHtml(currentFolderName)}</div>`;
       } else {
-        folderHistory = [];
-        currentFolderId = '';
-        currentFolderName = 'My Drive';
-        openFolderPicker();
+        navHtml += `<div style="font-size:13px; color:#94a3b8; font-weight:800;">📂 MY DRIVE (Gốc)</div>`;
       }
-    }
-
-    function openFolderPicker(event) {
-      if (event) event.stopPropagation();
-      const dropdown = document.getElementById('folderDropdown');
-      dropdown.style.display = 'block';
-      dropdown.innerHTML = '<div style="padding:15px; color:#38bdf8; font-size:12.5px; text-align:center;">🔄 Đang quét dữ liệu tầng này...</div>';
+      navHtml += `<button class="btn-secondary" onclick="loadFolderData()" style="padding: 6px 12px; font-size: 12px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">↻ Tải Lại</button>`;
+      topBar.innerHTML = navHtml;
 
       jsonpRequest('getFolders', { parentId: currentFolderId }, function(err, res) {
         if (err || !res.success) {
-          dropdown.innerHTML = '<div style="padding:10px; color:#fca5a5; font-size:12px; text-align:center;">⚠️ Lỗi quét thư mục con</div>';
+          listContainer.innerHTML = '<div style="padding:30px; color:#fca5a5; font-size:14px; text-align:center; font-weight:600;">⚠️ Không thể tải danh sách thư mục.</div>';
           return;
         }
         
-        let html = '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:6px; position:sticky; top:0; background:#0d1321; z-index:10;">';
-        
+        let html = '';
         if (currentFolderId) {
-          html += `<span style="font-size:12px; color:#fca5a5; cursor:pointer; font-weight:bold; padding:4px 8px; background:rgba(255,255,255,0.05); border-radius:4px;" onclick="goBackFolder(event)">🔙 Quay lại</span>`;
-          html += `<span style="font-size:11px; color:#94a3b8; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:bold;" title="${escapeHtml(currentFolderName)}">📂 ${escapeHtml(currentFolderName)}</span>`;
-        } else {
-          html += `<span style="font-size:11px; color:#94a3b8; font-weight:700;">📂 MY DRIVE (Gốc)</span>`;
-        }
-        html += `<span style="font-size:11px; color:#38bdf8; cursor:pointer;" onclick="openFolderPicker(event)">↻ Tải lại</span></div>`;
-
-        if (currentFolderId) {
-            html += `<div style="padding: 10px; background: rgba(56, 189, 248, 0.15); border: 1px dashed #38bdf8; border-radius: 6px; margin: 0 4px 10px 4px; text-align: center; cursor: pointer; color: #38bdf8; font-weight: bold; font-size: 12px; transition:0.2s;" onmouseover="this.style.background='#38bdf8'; this.style.color='#060913'" onmouseout="this.style.background='rgba(56, 189, 248, 0.15)'; this.style.color='#38bdf8'" onclick="selectFolder('${currentFolderId}', event)">✔ CHỌN THƯ MỤC [${escapeHtml(currentFolderName)}] LÀM ĐÍCH</div>`;
+            html += `<div style="padding: 14px; background: rgba(34, 197, 94, 0.15); border: 2px dashed #22c55e; border-radius: 12px; margin-bottom: 20px; text-align: center; cursor: pointer; color: #4ade80; font-weight: 800; font-size: 14px; transition:0.2s;" onmouseover="this.style.background='#22c55e'; this.style.color='#060913'" onmouseout="this.style.background='rgba(34, 197, 94, 0.15)'; this.style.color='#4ade80'" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC [${escapeHtml(currentFolderName)}] LÀM ĐÍCH</div>`;
         }
 
         if (!res.folders || res.folders.length === 0) {
-          html += '<div style="padding:10px; color:#94a3b8; font-size:12px; text-align:center;">Thư mục này trống hoặc không có thư mục con.</div>';
+          html += '<div style="padding:30px; color:#64748b; font-size:14px; text-align:center; font-weight:600;">Thư mục này trống.</div>';
         } else {
           res.folders.forEach(f => {
              let safeName = f.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
              html += `<div class="folder-item-wrap">
-                        <div class="folder-item" title="Nhấn để lặn sâu vào thư mục này" onclick="navToFolder('${f.id}', '${safeName}', event)">📁 ${escapeHtml(f.name)}</div>
+                        <div class="folder-item" title="Nhấn để mở thư mục này" onclick="navToFolder('${f.id}', '${safeName}', event)">
+                          <span style="font-size: 18px;">📁</span> ${escapeHtml(f.name)}
+                        </div>
                         <button class="btn-select-folder" title="Chọn thư mục này" onclick="selectFolder('${f.id}', event)">Chọn</button>
                       </div>`;
           });
         }
-        dropdown.innerHTML = html;
+        listContainer.innerHTML = html;
       }, 25000);
     }
 
@@ -304,7 +295,7 @@
         folderHistory.push({id: currentFolderId, name: currentFolderName});
         currentFolderId = id;
         currentFolderName = name;
-        openFolderPicker();
+        loadFolderData();
     }
     
     function goBackFolder(event) {
@@ -317,58 +308,41 @@
             currentFolderId = '';
             currentFolderName = 'My Drive';
         }
-        openFolderPicker();
+        loadFolderData();
     }
 
     function selectFolder(id, event) {
       if (event) event.stopPropagation();
       document.getElementById('dstUrl').value = 'https://drive.google.com/drive/folders/' + id;
-      document.getElementById('folderDropdown').style.display = 'none';
+      closeFolderModal();
     }
 
-    document.addEventListener('click', function(e) {
-      const btn = document.getElementById('btnBrowseDst');
-      const dropdown = document.getElementById('folderDropdown');
-      if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-         dropdown.style.display = 'none';
-      }
-    });
-
-    // MÁY LỌC LINK TỰ ĐỘNG
     function startNewTask() {
       if (requestBusy) return alert('Đang gửi yêu cầu, vui lòng chờ...');
       const srcText = document.getElementById('srcUrl').value.trim();
       const dst = document.getElementById('dstUrl').value.trim();
       
-      if (!srcText || !dst) return alert('Vui lòng điền đủ 2 trường dữ liệu!');
+      if (!srcText || !dst) return alert('Vui lòng nhập đủ Nguồn và Đích!');
 
-      // Dùng Regex tìm tất cả các link chứa drive.google.com nằm trong đoạn văn
       const regex = /(https:\/\/drive\.google\.com\/[^\s'"]+)/g;
       let matchedLinks = srcText.match(regex) || [];
-      
-      // Loại bỏ các link bị trùng lặp
       let uniqueLinks = [...new Set(matchedLinks)];
 
-      // Nếu Regex không bắt được (do người dùng chỉ dán mỗi cái ID), lấy nguyên cái text đó làm fallback
-      if (uniqueLinks.length === 0) {
-        uniqueLinks = [srcText];
-      }
+      if (uniqueLinks.length === 0) uniqueLinks = [srcText];
 
       const btn = document.getElementById('btnStart');
       requestBusy = true;
       btn.disabled = true;
       btn.innerText = `Đang khởi tạo ${uniqueLinks.length} tiến trình...`;
 
-      // Kiểm tra quyền 1 link đại diện để xem có chết không
       jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
         if (diagErr || !diag || !diag.success) {
           requestBusy = false;
           btn.disabled = false;
           btn.innerText = '🚀 Bắt Đầu Sao Chép Nền';
-          return alert('Không đủ quyền truy cập (hoặc link nguồn đầu tiên bị lỗi)!');
+          return alert('Lỗi kiểm tra quyền truy cập thư mục!');
         }
 
-        // Nếu quyền OK, gửi toàn bộ danh sách link lên server
         jsonpRequest('create_batch', {srcList: JSON.stringify(uniqueLinks), dst: dst}, function(err, res) {
           requestBusy = false;
           btn.disabled = false;
@@ -383,11 +357,10 @@
             document.getElementById('dstUrl').value = '';
             loadTasksStatus();
             checkStorage(); 
-            alert(`Đã đưa thành công ${res.count} link vào hàng đợi chạy ngầm!`);
           } else {
-            alert('Lỗi tạo tiến trình: ' + (res ? (res.error || 'Không rõ') : 'Không rõ'));
+            alert('Lỗi: ' + (res ? (res.error || 'Unknown') : 'Unknown'));
           }
-        }, 60000); // Tăng timeout lên 60s để phòng trường hợp dán hàng chục link
+        }, 60000); 
       }, 15000);
     }
 
@@ -399,15 +372,15 @@
         
         if (err) {
           setApiStatus(false);
-          container.innerHTML = '<div style="color:#fca5a5;font-size:12.5px;">⚠️ Không lấy được trạng thái: ' + escapeHtml(err.message) + '</div>';
+          container.innerHTML = '<div style="color:#fca5a5; padding: 20px; text-align:center;">⚠️ Lỗi kết nối máy chủ. F5 lại trang.</div>';
           return;
         }
         
         setApiStatus(true);
         
         if (!Array.isArray(tasks) || tasks.length === 0) {
-          titleEl.innerText = 'Tiến trình đang chạy ngầm';
-          container.innerHTML = '<div class="empty-card"><div class="empty-icon">📁</div><div class="empty-title">Hiện chưa có tiến trình nào đang chạy.</div><div class="empty-subtitle">Dán 1 mớ link vào ô phía trên rồi bấm "Bắt Đầu" để hệ thống tự lọc và copy.</div></div>';
+          titleEl.innerText = 'TIẾN TRÌNH ĐANG CHẠY NGẦM';
+          container.innerHTML = '<div class="empty-card"><div class="empty-icon">📁</div><div class="empty-title">Không có tiến trình nào đang chạy.</div><div class="empty-subtitle">Hệ thống sẵn sàng nhận lệnh sao chép mới.</div></div>';
           globalTasksData = [];
           return;
         }
@@ -417,7 +390,7 @@
           const id = escapeHtml(t.id || '');
           const displayName = escapeHtml(t.taskName ? t.taskName : ('Task: ' + (t.id || '')));
           const status = escapeHtml(t.statusMsg || 'Đang xử lý');
-          const lastFile = escapeHtml(t.lastFile || 'Đang kết nối...');
+          const lastFile = escapeHtml(t.lastFile || 'Khởi tạo...');
           const pct = Math.max(0, Math.min(100, Number(t.progressPercent) || 0));
           html += `
             <div class="task-item-card">
@@ -425,7 +398,7 @@
                 <div class="task-name">${displayName}</div>
                 <div class="task-status">${status}</div>
               </div>
-              <div class="current-file-box">Đang xử lý: <span>${lastFile}</span></div>
+              <div class="current-file-box">Xử lý: <span>${lastFile}</span></div>
               <div class="progress-wrap">
                 <div class="progress-label"><span>Tiến độ</span><span>${pct}%</span></div>
                 <div class="progress-track"><div class="progress-bar" style="width:${pct}%"></div></div>
@@ -433,22 +406,21 @@
               <div class="task-metrics">
                 <div class="metric-box" onclick="openDetailModal('${id}', 'scanned')"><div class="metric-label">Quét</div><div class="metric-value">${Number(t.totalScanned)||0}</div></div>
                 <div class="metric-box" onclick="openDetailModal('${id}', 'copied')"><div class="metric-label">Thành công</div><div class="metric-value">${Number(t.copiedFiles)||0}</div></div>
-                <div class="metric-box" onclick="openDetailModal('${id}', 'queued')"><div class="metric-label">Chờ 24h</div><div class="metric-value">${Number(t.queuedFiles)||0}</div></div>
+                <div class="metric-box" onclick="openDetailModal('${id}', 'queued')"><div class="metric-label">Chờ xử lý</div><div class="metric-value">${Number(t.queuedFiles)||0}</div></div>
                 <div class="metric-box" onclick="openDetailModal('${id}', 'skipped')"><div class="metric-label">Bỏ qua</div><div class="metric-value">${Number(t.skippedFiles)||0}</div></div>
               </div>
-              <button class="btn-kill" onclick="killTask('${id}')">Dừng tiến trình</button>
+              <button class="btn-kill" onclick="killTask('${id}')">✖ Xóa tiến trình này</button>
             </div>`;
         });
-        titleEl.innerText = `Tiến trình đang chạy ngầm (${tasks.length})`;
+        titleEl.innerText = `TIẾN TRÌNH ĐANG CHẠY (${tasks.length})`;
         container.innerHTML = html;
       }, 15000);
     }
 
     function killTask(taskId) {
-      if (!confirm('Bạn có chắc muốn dừng tiến trình này?')) return;
+      if (!confirm('Hủy tiến trình này? Dữ liệu đã copy sẽ không bị xóa.')) return;
       jsonpRequest('kill', {id: taskId}, function(err, res) {
         if (err) return alert(err.message);
-        if (!res || !res.success) return alert('Không thể dừng tiến trình.');
         loadTasksStatus();
       }, 15000);
     }
@@ -456,21 +428,22 @@
     function openDetailModal(taskId, type) {
       const task = globalTasksData.find(t => t.id === taskId);
       if (!task) return;
-      let title = 'Chi tiết tiến trình';
+      let title = '';
       let listData = [];
-      if (type === 'scanned') { title = '📂 Tệp đã quét'; listData = task.scannedList || []; }
-      else if (type === 'copied') { title = '✅ Thành công'; listData = task.copiedList || []; }
-      else if (type === 'queued') { title = '⏳ Chờ 24h'; listData = task.retryQueue || []; }
-      else if (type === 'skipped') { title = '🚫 Bỏ qua'; listData = task.skippedList || []; }
-      document.getElementById('modalTitle').innerHTML = `<span>${escapeHtml(title)}</span><button class="modal-close" onclick="closeModal()">Đóng lại ✕</button>`;
+      if (type === 'scanned') { title = '📂 Lịch sử quét'; listData = task.scannedList || []; }
+      else if (type === 'copied') { title = '✅ File thành công'; listData = task.copiedList || []; }
+      else if (type === 'queued') { title = '⏳ File chờ chạy lại'; listData = task.retryQueue || []; }
+      else if (type === 'skipped') { title = '🚫 File bị bỏ qua'; listData = task.skippedList || []; }
+      document.getElementById('modalTitle').innerText = title;
+      
       let listHtml = '';
       if (listData.length === 0) {
-        listHtml = '<div class="empty-msg">✨ Chưa có dữ liệu.</div>';
+        listHtml = '<div class="empty-msg">Trống.</div>';
       } else {
         listData.forEach(item => {
-          const name = escapeHtml(item.name || item.fileName || 'Tệp ẩn danh');
+          const name = escapeHtml(item.name || item.fileName || 'Không tên');
           const desc = escapeHtml(item.reason || 'Đang xử lý');
-          listHtml += `<div class="modal-item"><div class="modal-item-name">📄 ${name}</div><div class="modal-item-desc">Trạng thái: ${desc}</div></div>`;
+          listHtml += `<div class="modal-item"><div class="modal-item-name">📄 ${name}</div><div class="modal-item-desc">Info: ${desc}</div></div>`;
         });
       }
       document.getElementById('modalListContainer').innerHTML = listHtml;
