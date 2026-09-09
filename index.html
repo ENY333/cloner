@@ -14,6 +14,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; font-size: 14px; }
     
+    /* SCROLLBAR */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -23,10 +24,10 @@
     .sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: width 0.3s; z-index: 100;}
     .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     .topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); z-index: 10;}
-    .content-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+    .content-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth;}
 
-    /* SIDEBAR ELEMENTS */
-    .brand { padding: 24px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; color: var(--primary); transition: 0.3s;}
+    /* SIDEBAR */
+    .brand { padding: 24px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; color: var(--primary); transition: 0.3s; white-space: nowrap; overflow: hidden;}
     .brand svg { filter: drop-shadow(0px 2px 6px rgba(14, 165, 233, 0.4)); flex-shrink: 0;}
     .menu { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
     .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-dim); text-decoration: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap;}
@@ -35,7 +36,7 @@
     .user-profile { padding: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; white-space: nowrap; overflow: hidden;}
     .avatar { width: 36px; height: 36px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex-shrink: 0;}
 
-    /* TOPBAR ELEMENTS */
+    /* TOPBAR */
     .search-bar { display: flex; align-items: center; background: var(--bg-card); padding: 10px 16px; border-radius: 8px; width: 300px; border: 1px solid var(--border); }
     .search-bar input { background: transparent; border: none; outline: none; color: #fff; margin-left: 8px; width: 100%; font-family: inherit;}
     .topbar-right { display: flex; align-items: center; gap: 20px; }
@@ -45,22 +46,32 @@
     .time-date { font-size: 12px; color: var(--text-dim); }
     .time-clock { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
 
-    /* DASHBOARD GRID - CƠ CHẾ MINMAX CHỐNG BÓP NGHẸT */
+    /* THỐNG KÊ */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
     .stat-card { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between;}
     .stat-title { font-size: 13px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px;}
     .stat-value { font-size: 28px; font-weight: 800; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
     
+    /* BỐ CỤC CHÍNH (Đã sửa lỗi móp méo) */
     .main-grid { 
-      display: grid; 
-      /* Thay vì ép tỷ lệ % cứng, dùng minmax để giữ form khi thu nhỏ */
-      grid-template-columns: minmax(320px, 1fr) minmax(380px, 1.5fr) minmax(320px, 1fr); 
+      display: flex; 
+      flex-wrap: wrap; /* Cho phép rớt dòng khi hết chỗ */
       gap: 20px; 
-      flex: 1; 
-      min-height: 500px; 
+      align-content: flex-start;
+      flex: 1;
     }
+    .panel { 
+      background: var(--bg-card); 
+      border-radius: 16px; 
+      border: 1px solid var(--border); 
+      display: flex; 
+      flex-direction: column; 
+      overflow: hidden; 
+      flex: 1 1 320px; /* Định cỡ tối thiểu 320px, tự động co giãn */
+      min-height: 440px; /* BẮT BUỘC: Không bao giờ bị ép lùn xuống */
+    }
+    #tab-list { flex: 1.5 1 380px; } /* Cột danh sách ưu tiên to hơn */
     
-    .panel { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
     .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);}
     .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
 
@@ -107,13 +118,7 @@
        ========================================= */
     .bottom-nav { display: none; }
     
-    /* 1. Màn hình Laptop/Desktop nhỏ: Đẩy khối Chi tiết xuống dưới */
-    @media (max-width: 1400px) {
-      .main-grid { grid-template-columns: 1fr 1.2fr; }
-      #tab-overview { grid-column: 1 / -1; min-height: 400px; } 
-    }
-    
-    /* 2. Màn hình Tablet: Thu nhỏ Sidebar, chuyển Grid thành 1 cột dọc */
+    /* Thu hẹp Sidebar khi màn hình cỡ vừa (Tablet/Laptop) */
     @media (max-width: 1024px) {
       .sidebar { width: 80px; }
       .brand-text, .menu-text, .user-info { display: none; }
@@ -121,40 +126,34 @@
       .brand svg { margin: 0; width: 32px; height: 32px;}
       .menu-item { justify-content: center; padding: 16px 0; font-size: 20px;}
       .user-profile { justify-content: center; padding: 24px 0;}
-      
-      .main-grid { grid-template-columns: 1fr; }
-      #tab-create, #tab-list, #tab-overview { grid-column: 1 / -1; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
     }
     
-    /* 3. Màn hình Mobile & Extension (< 768px): Bật chế độ Tabs */
+    /* Giao diện Extension & Mobile (< 768px) */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .sidebar { display: none; }
       .topbar { padding: 0 16px; height: 60px; }
       .search-bar, .time-display { display: none; }
-      .content-area { padding: 16px; gap: 16px; }
+      .content-area { padding: 16px; gap: 16px; flex: 1;}
       
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
       .stat-card { padding: 16px; }
       .stat-value { font-size: 20px; }
       
-      /* Hủy ép flex để không bóp méo Form/Input */
-      .main-grid { display: flex; flex-direction: column; flex: none; min-height: unset; gap: 12px;}
+      .main-grid { display: flex; flex-direction: column; flex: 1; flex-wrap: nowrap; gap: 0; margin-bottom: 10px;}
       
-      /* Xử lý Tabs */
-      .panel { display: none; border-radius: 12px; flex: none; }
-      .panel.active-tab { display: flex; flex-direction: column; }
-      .panel-body { overflow: visible; } /* Giao lại quyền scroll cho content-area */
+      /* Biến đổi Panel thành chế độ Tabs ẩn/hiện */
+      .panel { display: none !important; border-radius: 12px; min-height: 480px; flex: 1; }
+      .panel.active-tab { display: flex !important; }
       
-      /* Navbar dưới cùng */
-      .bottom-nav { display: flex; justify-content: space-around; background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; position: sticky; bottom: 0; margin-top: auto;}
+      /* Thanh Navbar dưới đáy */
+      .bottom-nav { display: flex; justify-content: space-around; background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; flex-shrink: 0;}
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); font-size: 11px; font-weight: 700; cursor: pointer;}
       .nav-item.active { color: var(--primary); }
       .nav-item span { font-size: 20px; }
     }
 
-    /* Modal Overlay (Dùng chung) */
+    /* Modal Chọn Thư mục (Dùng chung) */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
     .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
     .modal-header { padding: 16px 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; }
@@ -231,8 +230,10 @@
         </div>
       </div>
 
+      <!-- MAIN GRID: Linh hoạt rớt dòng, không bao giờ ép móp méo -->
       <div class="main-grid">
-        <!-- TẠO TÁC VỤ -->
+        
+        <!-- Cột 1: TẠO TÁC VỤ -->
         <div class="panel active-tab" id="tab-create">
           <div class="panel-header">➕ Tạo tác vụ mới</div>
           <div class="panel-body">
@@ -259,7 +260,7 @@
           </div>
         </div>
 
-        <!-- DANH SÁCH -->
+        <!-- Cột 2: DANH SÁCH -->
         <div class="panel" id="tab-list">
           <div class="panel-header">
             <span>📋 Danh sách tác vụ</span>
@@ -270,7 +271,7 @@
           </div>
         </div>
 
-        <!-- CHI TIẾT -->
+        <!-- Cột 3: CHI TIẾT -->
         <div class="panel" id="tab-overview">
           <div class="panel-header">
             <span id="detailTitle">Chi tiết tác vụ</span>
@@ -281,17 +282,17 @@
           </div>
         </div>
 
-        <!-- LỊCH SỬ -->
-        <div class="panel" id="tab-history" style="display: none;">
+        <!-- BẢNG LỊCH SỬ (Ẩn đi theo mặc định trên PC) -->
+        <div class="panel" id="tab-history" style="display: none; flex: 1 1 100%;">
           <div class="panel-header">🕒 Lịch sử hoạt động</div>
-          <div class="panel-body">Chưa có lịch sử cũ.</div>
+          <div class="panel-body">Hệ thống ghi nhận log hoạt động sẽ được cập nhật ở phiên bản tiếp theo.</div>
         </div>
 
       </div>
     </div>
   </main>
 
-  <!-- BOTTOM NAV -->
+  <!-- BOTTOM NAV (Cho Màn hình nhỏ/Extension) -->
   <nav class="bottom-nav">
     <div class="nav-item" onclick="switchTab('tab-overview', this, true)"><span>📊</span> Tổng quan</div>
     <div class="nav-item active" onclick="switchTab('tab-create', this, true)"><span>➕</span> Tạo task</div>
@@ -338,21 +339,29 @@
     };
 
     function switchTab(tabId, el, isBottomNav = false) {
-      if(window.innerWidth > 768 && tabId !== 'tab-history') return; 
-
+      // 1. Cập nhật nút active
       const items = isBottomNav ? document.querySelectorAll('.nav-item') : document.querySelectorAll('.menu-item');
       items.forEach(i => i.classList.remove('active'));
-      el.classList.add('active');
+      if(el) el.classList.add('active');
 
-      document.querySelectorAll('.panel').forEach(p => {
-        p.classList.remove('active-tab');
-      });
-      
-      const target = document.getElementById(tabId);
-      target.classList.add('active-tab');
-      if(tabId === 'tab-history') {
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active-tab'));
-        target.classList.add('active-tab');
+      // 2. Logic điều hướng thông minh
+      if(window.innerWidth > 768) {
+         // MÀN HÌNH LỚN (PC/Tablet): Cuộn tới khối, thay vì ẩn khối
+         if (tabId === 'tab-history') {
+            document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+            document.getElementById('tab-history').style.display = 'flex';
+         } else {
+            // Đảm bảo 3 khối hiển thị lại nếu đang từ Lịch sử sang
+            document.querySelectorAll('.panel').forEach(p => p.style.display = 'flex');
+            document.getElementById('tab-history').style.display = 'none';
+            // Cuộn chuột mượt tới khu vực đó
+            const target = document.getElementById(tabId);
+            if(target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
+         }
+      } else {
+         // EXTENSION / MOBILE (< 768px): Cơ chế Tabs (Ẩn hết, chỉ hiện 1 khối)
+         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active-tab'));
+         document.getElementById(tabId).classList.add('active-tab');
       }
     }
 
