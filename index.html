@@ -619,6 +619,13 @@
         setApiStatus(true);
         globalTasksData = tasks || [];
         
+        // Sắp xếp tác vụ mới nhất lên đầu danh sách
+        globalTasksData.sort((a, b) => {
+            let timeA = parseInt(a.id.split('_')[1]) || 0;
+            let timeB = parseInt(b.id.split('_')[1]) || 0;
+            return timeB - timeA;
+        });
+        
         updateNotifications();
 
         const runningTasks = globalTasksData.filter(t => !t.completed);
@@ -671,7 +678,6 @@
       btnKill.style.display = 'block';
       btnKill.innerText = isHistoryTab ? "Xóa bản ghi" : "Hủy tác vụ";
       
-      // MINH BẠCH BẢNG LOG VỚI MÀU SẮC DỄ NHÌN
       let logs = (task.scannedList || []).reverse().map(l => {
           let badgeText = "Đang xử lý"; let badgeColor = "var(--primary)";
           if (l.reason && l.reason.includes("Copy mới") || l.reason.includes("thành công")) { badgeText = "MỚI"; badgeColor = "var(--success)"; }
