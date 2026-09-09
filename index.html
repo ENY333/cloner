@@ -118,7 +118,8 @@
     .detail-label { color: var(--text-dim); }
     .detail-val { font-weight: 600; text-align: right; max-width: 60%; word-break: break-all;}
     .log-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 15px;}
-    .log-line { margin-bottom: 6px; border-bottom: 1px dotted rgba(255,255,255,0.05); padding-bottom: 4px;}
+    .log-line { margin-bottom: 6px; border-bottom: 1px dotted rgba(255,255,255,0.05); padding-bottom: 4px; display: flex; align-items: flex-start; gap: 8px;}
+    .log-badge { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; white-space: nowrap; flex-shrink: 0;}
 
     /* RESPONSIVE */
     .bottom-nav { display: none; }
@@ -200,7 +201,6 @@
           <div class="noti-popup" id="notiPopup" onclick="event.stopPropagation()">
             <div class="noti-header">
               <span>Thông báo mới</span>
-              <!-- Đổi tên thành "Xóa tất cả" -->
               <button class="btn-read-all" onclick="clearAllNotifications()">Xóa tất cả</button>
             </div>
             <div class="noti-body" id="notiList">
@@ -552,7 +552,9 @@
       if (uniqueLinks.length === 0) uniqueLinks = [srcText];
 
       const btn = document.getElementById('btnStart');
-      requestBusy = true; btn.disabled = true; btn.innerHTML = `⏳ ĐANG KHỞI TẠO TÁC VỤ...`;
+      requestBusy = true; 
+      btn.disabled = true; 
+      btn.innerHTML = `⏳ ĐANG KHỞI TẠO TÁC VỤ...`; 
 
       jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
         if (diagErr || !diag || !diag.success) {
@@ -561,6 +563,7 @@
         }
         jsonpRequest('create_batch', {srcList: JSON.stringify(uniqueLinks), dst: dst}, function(err, res) {
           requestBusy = false; 
+          
           if (err) {
              btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
              return alert(err.message);
@@ -568,6 +571,7 @@
           if (res && res.success) {
             document.getElementById('srcUrl').value = ''; document.getElementById('dstUrl').value = '';
             loadTasksStatus(); checkStorage();
+            
             btn.style.background = 'var(--success)';
             btn.innerHTML = `✔️ ĐÃ ĐƯA VÀO HÀNG ĐỢI`;
             setTimeout(() => {
@@ -575,6 +579,7 @@
                 btn.style.background = '';
                 btn.innerHTML = `▶ BẮT ĐẦU SAO CHÉP`;
             }, 3000);
+
           } else { 
             btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
             alert('Lỗi: ' + (res ? res.error : 'Unknown')); 
@@ -666,7 +671,18 @@
       btnKill.style.display = 'block';
       btnKill.innerText = isHistoryTab ? "Xóa bản ghi" : "Hủy tác vụ";
       
-      let logs = (task.scannedList || []).reverse().map(l => `<div class="log-line">⚡ Đã xử lý: ${escapeHtml(l.name)}</div>`).join('');
+      // MINH BẠCH BẢNG LOG VỚI MÀU SẮC DỄ NHÌN
+      let logs = (task.scannedList || []).reverse().map(l => {
+          let badgeText = "Đang xử lý"; let badgeColor = "var(--primary)";
+          if (l.reason && l.reason.includes("Copy mới") || l.reason.includes("thành công")) { badgeText = "MỚI"; badgeColor = "var(--success)"; }
+          if (l.reason && l.reason.includes("Bỏ qua")) { badgeText = "TRÙNG"; badgeColor = "var(--warning)"; }
+          if (l.reason && l.reason.includes("Lỗi")) { badgeText = "LỖI"; badgeColor = "var(--danger)"; }
+          
+          return `<div class="log-line">
+                     <span class="log-badge" style="background: rgba(255,255,255,0.1); color: ${badgeColor}; border: 1px solid ${badgeColor};">${badgeText}</span> 
+                     ${escapeHtml(l.name)}
+                  </div>`;
+      }).join('');
       if(!logs) logs = "Hệ thống đang khởi tạo log...";
 
       containerEl.innerHTML = `
