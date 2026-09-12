@@ -140,7 +140,6 @@
       .search-bar, .time-display { display: none; }
       .mobile-brand { display: flex; } 
       
-      /* CĂN GIỮA POPUP THÔNG BÁO TRÊN MÀN HÌNH NHỎ ĐỂ KHÔNG BỊ CẮT VIỀN */
       .noti-popup {
         position: fixed;
         top: 65px;
@@ -208,7 +207,6 @@
           <span style="font-size: 18px;">🔔</span>
           <div class="noti-badge" id="notiBadge">0</div>
           
-          <!-- BẢNG POPUP THÔNG BÁO -->
           <div class="noti-popup" id="notiPopup" onclick="event.stopPropagation()">
             <div class="noti-header">
               <span>Thông báo mới</span>
@@ -280,7 +278,10 @@
             <div class="form-group">
               <label>Tùy chọn hệ thống</label>
               <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" checked disabled> Tự động kiểm tra quyền truy cập</label>
+                <!-- NÂNG CẤP: Đã mở khóa nút Kiểm tra quyền -->
+                <label class="checkbox-item" title="Bỏ tích nếu hệ thống báo lỗi sai hoặc bạn muốn ép chạy">
+                  <input type="checkbox" id="chkCheckAccess" checked> Tự động kiểm tra quyền truy cập (Bỏ tích để ép chạy)
+                </label>
                 <label class="checkbox-item"><input type="checkbox" checked disabled> Bỏ qua file trùng tên (Chống lặp)</label>
               </div>
             </div>
@@ -361,7 +362,6 @@
     let requestBusy = false;
     let selectedTaskId = null;
     
-    // Hệ thống LocalStorage vĩnh viễn
     let notifications = JSON.parse(localStorage.getItem('cloner_notifs') || '[]');
     let unreadCount = parseInt(localStorage.getItem('cloner_unread') || '0');
     let notifiedTaskIds = new Set(JSON.parse(localStorage.getItem('cloner_notified_ids') || '[]'));
@@ -404,7 +404,6 @@
          popup.style.display = 'none';
       } else {
          popup.style.display = 'flex';
-         // Bấm vào chuông -> Dọn sạch chấm đỏ và lưu vào bộ nhớ
          if (unreadCount > 0) {
              unreadCount = 0;
              saveNotiState();
@@ -576,7 +575,6 @@
       const dst = document.getElementById('dstUrl').value.trim();
       if (!srcText || !dst) return alert('Nhập đủ Nguồn và Đích!');
 
-      // CẬP NHẬT MỚI NHẤT: Bắt mọi thể loại link Google
       let uniqueLinks = [...new Set(srcText.match(/(https:\/\/[a-zA-Z0-9.-]*google\.com\/[^\s'"]+)/g) || [])];
       if (uniqueLinks.length === 0) uniqueLinks = [srcText];
 
@@ -585,14 +583,10 @@
       btn.disabled = true; 
       btn.innerHTML = `⏳ ĐANG KHỞI TẠO TÁC VỤ...`; 
 
-      jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
-        if (diagErr || !diag || !diag.success) {
-          requestBusy = false; btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
-          return alert('Lỗi kiểm tra quyền truy cập thư mục!');
-        }
+      // NÂNG CẤP: Hàm chạy Bypass 
+      const runBatch = function() {
         jsonpRequest('create_batch', {srcList: JSON.stringify(uniqueLinks), dst: dst}, function(err, res) {
           requestBusy = false; 
-          
           if (err) {
              btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
              return alert(err.message);
@@ -608,13 +602,32 @@
                 btn.style.background = '';
                 btn.innerHTML = `▶ BẮT ĐẦU SAO CHÉP`;
             }, 3000);
-
           } else { 
             btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
             alert('Lỗi: ' + (res ? res.error : 'Unknown')); 
           }
         }); 
-      });
+      };
+
+      // Kiểm tra xem người dùng có TÍCH vào ô "Tự động kiểm tra quyền" không
+      const isCheckEnabled = document.getElementById('chkCheckAccess').checked;
+
+      if (isCheckEnabled) {
+          jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
+            if (diagErr || !diag || !diag.success) {
+              requestBusy = false; btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
+              
+              // HIỂN THỊ LỖI RÕ RÀNG HƠN
+              let errStr = diagErr ? diagErr.message : (diag ? ("- Nguồn: " + (diag.source.error||"OK") + "\n- Đích: " + (diag.destination.error||"OK")) : "Lỗi mạng");
+              
+              return alert('Lỗi kiểm tra quyền truy cập (Hoặc định dạng link bị sai)!\n\nChi tiết:\n' + errStr + '\n\n💡 MẸO: Nếu bạn chắc chắn link này ĐÚNG, hãy BỎ TÍCH ô "Tự động kiểm tra quyền truy cập" để ép hệ thống chạy!');
+            }
+            runBatch();
+          });
+      } else {
+          // Bỏ qua kiểm tra, ÉP CHẠY LUÔN
+          runBatch();
+      }
     }
 
     function buildTaskHtml(t) {
