@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drive Cloud Cloner - Pro Dashboard</title>
-  <!-- Đã mã hóa lại Logo Favicon để không bị lỗi trên Mobile -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(14,165,233,0.2)' stroke='%230ea5e9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z'/%3E%3Cpolygon fill='%230ea5e9' points='13 2 9 13 12 13 11 22 15 11 12 11 13 2'/%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
@@ -362,7 +361,7 @@
     let requestBusy = false;
     let selectedTaskId = null;
     
-    // Tích hợp LocalStorage lưu vĩnh viễn trạng thái chuông
+    // Hệ thống LocalStorage vĩnh viễn
     let notifications = JSON.parse(localStorage.getItem('cloner_notifs') || '[]');
     let unreadCount = parseInt(localStorage.getItem('cloner_unread') || '0');
     let notifiedTaskIds = new Set(JSON.parse(localStorage.getItem('cloner_notified_ids') || '[]'));
@@ -538,6 +537,7 @@
     function loadFolderData() {
       const topBar = document.getElementById('folderModalTopBar');
       const listContainer = document.getElementById('folderListContainer');
+      
       listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--primary);">Đang tải dữ liệu Drive...</div>';
 
       let navHtml = currentFolderId 
@@ -546,7 +546,11 @@
       topBar.innerHTML = navHtml;
 
       jsonpRequest('getFolders', { parentId: currentFolderId }, function(err, res) {
-        if (err || !res.success) { listContainer.innerHTML = '<div style="color:var(--danger); text-align:center;">Lỗi tải thư mục</div>'; return; }
+        if (err || !res.success) { 
+           let errorDetail = err ? err.message : (res ? res.error : "Lỗi không xác định");
+           listContainer.innerHTML = `<div style="color:var(--danger); text-align:center; padding: 20px;"><b>Lỗi tải thư mục</b><br><span style="font-size:12px; color:var(--text-dim); margin-top:8px; display:block;">Chi tiết: ${escapeHtml(errorDetail)}</span></div>`; 
+           return; 
+        }
         let html = '';
         if (currentFolderId) { html += `<button class="btn btn-primary" style="width:100%; margin-bottom:12px; background: rgba(16,185,129,0.2); color:var(--success);" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC NÀY</button>`; }
         if (!res.folders || res.folders.length === 0) { html += '<div style="text-align:center; color:var(--text-dim);">Thư mục trống.</div>'; } 
@@ -572,7 +576,8 @@
       const dst = document.getElementById('dstUrl').value.trim();
       if (!srcText || !dst) return alert('Nhập đủ Nguồn và Đích!');
 
-      let uniqueLinks = [...new Set(srcText.match(/(https:\/\/drive\.google\.com\/[^\s'"]+)/g) || [])];
+      // CẬP NHẬT MỚI NHẤT: Bắt mọi thể loại link Google
+      let uniqueLinks = [...new Set(srcText.match(/(https:\/\/[a-zA-Z0-9.-]*google\.com\/[^\s'"]+)/g) || [])];
       if (uniqueLinks.length === 0) uniqueLinks = [srcText];
 
       const btn = document.getElementById('btnStart');
