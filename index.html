@@ -223,7 +223,7 @@
           <div class="status-dot" id="apiDot"></div>
           <div>
             <div style="font-size: 12px; font-weight: 700; color: var(--success);" id="apiStatusText">Đang tải...</div>
-            <div style="font-size: 10px; color: var(--text-dim);">API hoạt động bình thường</div>
+            <div style="font-size: 10px; color: var(--text-dim);" id="apiStatusSub">Đang kết nối hệ thống</div>
           </div>
         </div>
         <div class="time-display">
@@ -279,7 +279,6 @@
             <div class="form-group">
               <label>Tùy chọn hệ thống</label>
               <div class="checkbox-group">
-                <!-- NÂNG CẤP: Đã mở khóa nút Kiểm tra quyền -->
                 <label class="checkbox-item" title="Bỏ tích nếu hệ thống báo lỗi sai hoặc bạn muốn ép chạy">
                   <input type="checkbox" id="chkCheckAccess" checked> Tự động kiểm tra quyền truy cập (Bỏ tích để ép chạy)
                 </label>
@@ -359,7 +358,6 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxZW_wyEm7SNNohle0IcrafMkXG6Vqzx4h3khRbRp0Vv5HHKTfqO_1oY5FHRF2RqKoe/exec";
 
 let globalTasksData = [];
-let pollingStarted = false;
 let requestBusy = false;
 let selectedTaskId = null;
 
@@ -397,13 +395,8 @@ window.onload = function () {
   if (autoSrc) document.getElementById('srcUrl').value = autoSrc;
 
   renderNotifications();
-  loadTasksStatus();
+  loadTasksStatus(); // Sẽ tự động đệ quy chạy tiếp
   checkStorage();
-
-  if (!pollingStarted) {
-    pollingStarted = true;
-    setInterval(loadTasksStatus, 8000);
-  }
 };
 
 function toggleNotiPopup(e) {
@@ -575,23 +568,27 @@ function checkStorage() {
       bar.style.width = pct + '%';
       if (pct > 90) bar.style.background = 'var(--danger)';
     }
-  }, 15000);
+  });
 }
 
+// CẬP NHẬT: Xử lý giao diện "Mất kết nối" đồng bộ cho cả chữ nhỏ
 function setApiStatus(isOnline) {
   const dot = document.getElementById('apiDot');
   const text = document.getElementById('apiStatusText');
+  const sub = document.getElementById('apiStatusSub');
 
   if (isOnline) {
     dot.style.background = 'var(--success)';
     dot.style.boxShadow = '0 0 10px var(--success)';
     text.innerText = 'Server Online';
     text.style.color = 'var(--success)';
+    sub.innerText = 'API hoạt động bình thường';
   } else {
     dot.style.background = 'var(--danger)';
     dot.style.boxShadow = '0 0 10px var(--danger)';
     text.innerText = 'Mất kết nối';
     text.style.color = 'var(--danger)';
+    sub.innerText = 'Đang thử kết nối lại...';
   }
 }
 
@@ -745,7 +742,6 @@ function startNewTask() {
           document.getElementById('srcUrl').value = '';
           document.getElementById('dstUrl').value = '';
 
-          loadTasksStatus();
           checkStorage();
 
           btn.style.background = 'var(--success)';
@@ -879,10 +875,13 @@ function buildTaskHtml(t) {
     </div>`;
 }
 
+// CẬP NHẬT: Polling đệ quy thông minh chống kẹt mạng (Lag)
 function loadTasksStatus() {
   jsonpRequest('list', {}, function (err, tasks) {
     if (err) {
       setApiStatus(false);
+      // Gọi lại chính nó sau 8 giây khi thất bại
+      setTimeout(loadTasksStatus, 8000);
       return;
     }
 
@@ -929,6 +928,9 @@ function loadTasksStatus() {
         globalTasksData.find(t => t.id === selectedTaskId) || null
       );
     }
+    
+    // Đã nhận được dữ liệu xong, nghỉ 8 giây rồi mới gọi đợt mới (Tránh kẹt mạng)
+    setTimeout(loadTasksStatus, 8000);
   });
 }
 
@@ -1154,10 +1156,9 @@ function killSelectedTask() {
 
       selectedTaskId = null;
       renderDetail(null);
-      loadTasksStatus();
     }
   );
 }
-</script>
+  </script>
 </body>
 </html>
