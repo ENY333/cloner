@@ -109,6 +109,7 @@
     .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap;}
     .badge.running { background: rgba(14, 165, 233, 0.15); color: var(--primary); border: 1px solid rgba(14, 165, 233, 0.2); }
     .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
     .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 8px;}
     .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: width 0.3s; }
     .task-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-top: 8px;}
@@ -302,7 +303,7 @@
         <div class="panel panel-detail">
           <div class="panel-header">
             <span id="overviewDetailTitle">Chi tiết tác vụ</span>
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillOverview" style="display:none;">Hủy tác vụ</button>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillOverview">Hủy tác vụ</button>
           </div>
           <div class="panel-body" id="overviewDetailContainer" style="padding: 16px;">
             <div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>
@@ -325,7 +326,7 @@
         <div class="panel panel-detail">
           <div class="panel-header">
             <span id="historyDetailTitle">Chi tiết lịch sử</span>
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillHistory" style="display:none;">Xóa bản ghi</button>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="killSelectedTask()" id="btnKillHistory">Xóa bản ghi</button>
           </div>
           <div class="panel-body" id="historyDetailContainer" style="padding: 16px;">
             <div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>
@@ -355,408 +356,808 @@
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxZW_wyEm7SNNohle0IcrafMkXG6Vqzx4h3khRbRp0Vv5HHKTfqO_1oY5FHRF2RqKoe/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxZW_wyEm7SNNohle0IcrafMkXG6Vqzx4h3khRbRp0Vv5HHKTfqO_1oY5FHRF2RqKoe/exec";
 
-    let globalTasksData = [];
-    let pollingStarted = false;
-    let requestBusy = false;
-    let selectedTaskId = null;
-    
-    let notifications = JSON.parse(localStorage.getItem('cloner_notifs') || '[]');
-    let unreadCount = parseInt(localStorage.getItem('cloner_unread') || '0');
-    let notifiedTaskIds = new Set(JSON.parse(localStorage.getItem('cloner_notified_ids') || '[]'));
+let globalTasksData = [];
+let pollingStarted = false;
+let requestBusy = false;
+let selectedTaskId = null;
 
-    function saveNotiState() {
-        localStorage.setItem('cloner_notifs', JSON.stringify(notifications));
-        localStorage.setItem('cloner_unread', unreadCount.toString());
-        localStorage.setItem('cloner_notified_ids', JSON.stringify([...notifiedTaskIds]));
+let notifications = JSON.parse(localStorage.getItem('cloner_notifs') || '[]');
+let unreadCount = parseInt(localStorage.getItem('cloner_unread') || '0', 10);
+let notifiedTaskIds = new Set(JSON.parse(localStorage.getItem('cloner_notified_ids') || '[]'));
+
+function saveNotiState() {
+  localStorage.setItem('cloner_notifs', JSON.stringify(notifications));
+  localStorage.setItem('cloner_unread', String(unreadCount));
+  localStorage.setItem('cloner_notified_ids', JSON.stringify([...notifiedTaskIds]));
+}
+
+document.addEventListener('click', function () {
+  const popup = document.getElementById('notiPopup');
+  if (popup && popup.style.display === 'flex') popup.style.display = 'none';
+});
+
+setInterval(() => {
+  const now = new Date();
+  document.getElementById('timeStr').innerText =
+    now.toLocaleTimeString('vi-VN', { hour12: false });
+  document.getElementById('dateStr').innerText =
+    now.toLocaleDateString('vi-VN', {
+      weekday: 'long',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+}, 1000);
+
+window.onload = function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const autoSrc = urlParams.get('autoSrc');
+  if (autoSrc) document.getElementById('srcUrl').value = autoSrc;
+
+  renderNotifications();
+  loadTasksStatus();
+  checkStorage();
+
+  if (!pollingStarted) {
+    pollingStarted = true;
+    setInterval(loadTasksStatus, 8000);
+  }
+};
+
+function toggleNotiPopup(e) {
+  e.stopPropagation();
+  const popup = document.getElementById('notiPopup');
+
+  if (popup.style.display === 'flex') {
+    popup.style.display = 'none';
+  } else {
+    popup.style.display = 'flex';
+
+    if (unreadCount > 0) {
+      unreadCount = 0;
+      saveNotiState();
+      document.getElementById('notiBadge').style.display = 'none';
     }
-    
-    document.addEventListener('click', function() {
-        const popup = document.getElementById('notiPopup');
-        if(popup && popup.style.display === 'flex') popup.style.display = 'none';
+  }
+}
+
+function updateNotifications() {
+  let hasNew = false;
+
+  globalTasksData.forEach(t => {
+    if (t.completed && !notifiedTaskIds.has(t.id)) {
+      notifiedTaskIds.add(t.id);
+
+      notifications.unshift({
+        id: t.id,
+        name: t.taskName,
+        time: new Date().toLocaleTimeString('vi-VN', { hour12: false })
+      });
+
+      unreadCount++;
+      hasNew = true;
+    }
+  });
+
+  if (hasNew) {
+    saveNotiState();
+    renderNotifications();
+  }
+}
+
+function renderNotifications() {
+  const badge = document.getElementById('notiBadge');
+  const list = document.getElementById('notiList');
+
+  if (unreadCount > 0) {
+    badge.innerText = unreadCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  if (notifications.length > 0) {
+    list.innerHTML = notifications.map(n => `
+      <div class="noti-item">
+        <div class="noti-icon">✔️</div>
+        <div class="noti-content">
+          <div class="noti-title">${escapeHtml(n.name)}</div>
+          <div class="noti-time">${escapeHtml(n.time)}</div>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    list.innerHTML = '<div class="noti-empty">Không có thông báo nào.</div>';
+  }
+}
+
+function clearAllNotifications() {
+  notifications = [];
+  unreadCount = 0;
+  saveNotiState();
+  renderNotifications();
+  document.getElementById('notiPopup').style.display = 'none';
+}
+
+function switchTab(tabId, el, isBottomNav = false) {
+  const items = isBottomNav
+    ? document.querySelectorAll('.nav-item')
+    : document.querySelectorAll('.menu-item');
+
+  items.forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  document.querySelectorAll('.tab-page')
+    .forEach(p => p.classList.remove('active-page'));
+
+  document.getElementById(tabId).classList.add('active-page');
+
+  selectedTaskId = null;
+  renderDetail(null);
+
+  document.querySelectorAll('.task-item')
+    .forEach(e => e.classList.remove('active-select'));
+}
+
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>'"]/g, function (c) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[c];
+  });
+}
+
+function jsonpRequest(action, params, callback, timeoutMs) {
+  const cb = 'cb_' + action + '_' + Math.random().toString(36).substring(2, 10);
+  const script = document.createElement('script');
+
+  let finished = false;
+  let timer = null;
+
+  const query = Object.keys(params || {})
+    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+    .join('&');
+
+  const finish = function () {
+    if (finished) return;
+    finished = true;
+
+    if (timer) clearTimeout(timer);
+
+    try { delete window[cb]; } catch (e) {}
+
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+
+  window[cb] = function (res) {
+    finish();
+    callback(null, res);
+  };
+
+  script.onerror = function () {
+    finish();
+    callback(new Error('Lỗi kết nối tới máy chủ.'), null);
+  };
+
+  script.src = GAS_URL +
+    '?action=' + encodeURIComponent(action) +
+    (query ? '&' + query : '') +
+    '&callback=' + cb;
+
+  document.body.appendChild(script);
+
+  timer = setTimeout(function () {
+    if (finished) return;
+    finish();
+    callback(new Error('Máy chủ phản hồi quá lâu.'), null);
+  }, timeoutMs || 30000);
+}
+
+function checkStorage() {
+  jsonpRequest('quota', {}, function (err, res) {
+    if (!err && res && res.success) {
+      const usedGB = (res.used / (1024 * 1024 * 1024)).toFixed(2);
+      const limitGB = (res.limit / (1024 * 1024 * 1024)).toFixed(2);
+      const pct = res.limit > 0
+        ? Math.min(100, Math.round((res.used / res.limit) * 100))
+        : 0;
+
+      document.getElementById('storageText').innerText =
+        `${usedGB} / ${limitGB} GB`;
+
+      const bar = document.getElementById('storageBar');
+      bar.style.width = pct + '%';
+      if (pct > 90) bar.style.background = 'var(--danger)';
+    }
+  }, 15000);
+}
+
+function setApiStatus(isOnline) {
+  const dot = document.getElementById('apiDot');
+  const text = document.getElementById('apiStatusText');
+
+  if (isOnline) {
+    dot.style.background = 'var(--success)';
+    dot.style.boxShadow = '0 0 10px var(--success)';
+    text.innerText = 'Server Online';
+    text.style.color = 'var(--success)';
+  } else {
+    dot.style.background = 'var(--danger)';
+    dot.style.boxShadow = '0 0 10px var(--danger)';
+    text.innerText = 'Mất kết nối';
+    text.style.color = 'var(--danger)';
+  }
+}
+
+let folderHistory = [];
+let currentFolderId = '';
+let currentFolderName = 'My Drive';
+
+function openFolderModal() {
+  document.getElementById('folderModal').style.display = 'flex';
+  folderHistory = [];
+  currentFolderId = '';
+  currentFolderName = 'My Drive';
+  loadFolderData();
+}
+
+function closeFolderModal() {
+  document.getElementById('folderModal').style.display = 'none';
+}
+
+function loadFolderData() {
+  const topBar = document.getElementById('folderModalTopBar');
+  const listContainer = document.getElementById('folderListContainer');
+
+  listContainer.innerHTML =
+    '<div style="text-align:center; padding:20px; color:var(--primary);">Đang tải dữ liệu Drive...</div>';
+
+  const navHtml = currentFolderId
+    ? `<button class="btn btn-outline" style="padding:4px 8px;font-size:12px;" onclick="goBackFolder(event)">🔙 Quay lại</button>
+       <span style="font-weight:700;font-size:13px;margin-left:8px;">${escapeHtml(currentFolderName)}</span>`
+    : '<span style="font-weight:800;font-size:13px;">📂 MY DRIVE</span>';
+
+  topBar.innerHTML = navHtml;
+
+  jsonpRequest('getFolders', { parentId: currentFolderId }, function (err, res) {
+    if (err || !res || !res.success) {
+      const errorDetail = err
+        ? err.message
+        : (res ? res.error : 'Lỗi không xác định');
+
+      listContainer.innerHTML =
+        `<div style="color:var(--danger);text-align:center;padding:20px;">
+          <b>Lỗi tải thư mục</b><br>
+          <span style="font-size:12px;color:var(--text-dim);margin-top:8px;display:block;">
+            ${escapeHtml(errorDetail)}
+          </span>
+        </div>`;
+      return;
+    }
+
+    let html = '';
+
+    if (currentFolderId) {
+      html += `<button class="btn btn-primary" style="width:100%;margin-bottom:12px;background:rgba(16,185,129,.2);color:var(--success);" onclick="selectFolder('${escapeHtml(currentFolderId)}', event)">✔️ CHỌN THƯ MỤC NÀY</button>`;
+    }
+
+    if (!res.folders || res.folders.length === 0) {
+      html += '<div style="text-align:center;color:var(--text-dim);">Thư mục trống.</div>';
+    } else {
+      res.folders.forEach(f => {
+        const safeName = String(f.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+        html += `
+          <div class="task-item" style="display:flex;justify-content:space-between;align-items:center;padding:10px;"
+               onclick="navToFolder('${escapeHtml(f.id)}','${safeName}',event)">
+            <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              📁 ${escapeHtml(f.name)}
+            </span>
+            <button class="btn btn-primary" style="padding:4px 10px;font-size:11px;flex-shrink:0;"
+                    onclick="selectFolder('${escapeHtml(f.id)}',event);event.stopPropagation();">
+              Chọn
+            </button>
+          </div>`;
+      });
+    }
+
+    listContainer.innerHTML = html;
+  });
+}
+
+function navToFolder(id, name, e) {
+  if (e) e.stopPropagation();
+  folderHistory.push({ id: currentFolderId, name: currentFolderName });
+  currentFolderId = id;
+  currentFolderName = name;
+  loadFolderData();
+}
+
+function goBackFolder(e) {
+  if (e) e.stopPropagation();
+
+  if (folderHistory.length > 0) {
+    const prev = folderHistory.pop();
+    currentFolderId = prev.id;
+    currentFolderName = prev.name;
+  } else {
+    currentFolderId = '';
+    currentFolderName = 'My Drive';
+  }
+
+  loadFolderData();
+}
+
+function selectFolder(id, e) {
+  if (e) e.stopPropagation();
+
+  document.getElementById('dstUrl').value =
+    'https://drive.google.com/drive/folders/' + id;
+
+  closeFolderModal();
+}
+
+function startNewTask() {
+  if (requestBusy) return alert('Hệ thống đang bận...');
+
+  const srcText = document.getElementById('srcUrl').value.trim();
+  const dst = document.getElementById('dstUrl').value.trim();
+
+  if (!srcText || !dst) return alert('Nhập đủ Nguồn và Đích!');
+
+  let uniqueLinks = [
+    ...new Set(
+      srcText.match(/(https:\/\/[a-zA-Z0-9.-]*google\.com\/[^\s'"]+)/g) || []
+    )
+  ];
+
+  if (uniqueLinks.length === 0) uniqueLinks = [srcText];
+
+  const btn = document.getElementById('btnStart');
+
+  requestBusy = true;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ ĐANG KHỞI TẠO TÁC VỤ...';
+
+  const runBatch = function () {
+    jsonpRequest(
+      'create_batch',
+      {
+        srcList: JSON.stringify(uniqueLinks),
+        dst: dst
+      },
+      function (err, res) {
+        requestBusy = false;
+
+        if (err) {
+          btn.disabled = false;
+          btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
+          return alert(err.message);
+        }
+
+        if (res && res.success) {
+          document.getElementById('srcUrl').value = '';
+          document.getElementById('dstUrl').value = '';
+
+          loadTasksStatus();
+          checkStorage();
+
+          btn.style.background = 'var(--success)';
+          btn.innerHTML =
+            `✔️ ĐÃ TẠO ${res.count || 0} TÁC VỤ`;
+
+          if (res.errors && res.errors.length) {
+            const text = res.errors
+              .map(x => `• ${x.error}`)
+              .join('\n');
+
+            setTimeout(() => alert(
+              'Một số link không tạo được tác vụ:\n\n' + text
+            ), 50);
+          }
+
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.style.background = '';
+            btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
+          }, 3000);
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
+
+          alert('Lỗi: ' + (res ? res.error : 'Không xác định'));
+        }
+      }
+    );
+  };
+
+  const isCheckEnabled =
+    document.getElementById('chkCheckAccess').checked;
+
+  if (isCheckEnabled) {
+    jsonpRequest(
+      'diagnose',
+      {
+        src: uniqueLinks[0],
+        dst: dst
+      },
+      function (diagErr, diag) {
+        if (diagErr || !diag || !diag.success) {
+          requestBusy = false;
+          btn.disabled = false;
+          btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
+
+          const errStr = diagErr
+            ? diagErr.message
+            : (
+                diag
+                  ? '- Nguồn: ' + (diag.source.error || 'OK') +
+                    '\n- Đích: ' + (diag.destination.error || 'OK')
+                  : 'Lỗi mạng'
+              );
+
+          return alert(
+            'Không kiểm tra được nguồn/đích.\n\n' +
+            'Chi tiết:\n' + errStr +
+            '\n\nNếu nguồn có quyền đọc nhưng một số file bên trong bị khóa copy, ' +
+            'tác vụ vẫn sẽ tiếp tục và đánh dấu riêng từng file bị chặn.'
+          );
+        }
+
+        runBatch();
+      }
+    );
+  } else {
+    runBatch();
+  }
+}
+
+function getTaskStatusLabel(t) {
+  if (!t.completed) return 'Đang chạy';
+
+  const blocked = Number(t.blockedFiles || 0);
+  const failed = Number(t.failedFiles || 0);
+
+  if (blocked || failed) return 'Hoàn tất có lỗi';
+  return 'Hoàn thành';
+}
+
+function getTaskBadgeClass(t) {
+  if (!t.completed) return 'running';
+
+  const blocked = Number(t.blockedFiles || 0);
+  const failed = Number(t.failedFiles || 0);
+
+  return (blocked || failed) ? 'warning' : 'success';
+}
+
+function buildTaskHtml(t) {
+  const id = escapeHtml(t.id);
+  const name = escapeHtml(t.taskName);
+  const status = getTaskStatusLabel(t);
+  const badgeClass = getTaskBadgeClass(t);
+  const pct = Math.max(
+    0,
+    Math.min(100, Number(t.progressPercent) || 0)
+  );
+
+  const isActive =
+    id === escapeHtml(selectedTaskId) ? 'active-select' : '';
+
+  const blocked = Number(t.blockedFiles || 0);
+  const failed = Number(t.failedFiles || 0);
+  const queued = Number(t.queuedFiles || 0);
+
+  return `
+    <div class="task-item ${isActive}" onclick="selectTask('${id}', event)">
+      <div class="task-top">
+        <div class="task-name" title="${name}">${name}</div>
+        <div class="badge ${badgeClass}">${status}</div>
+      </div>
+
+      <div style="font-size:12px;color:var(--text-dim);">
+        ${pct}% - ${escapeHtml(t.lastFile || '')}
+      </div>
+
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" style="width:${pct}%"></div>
+      </div>
+
+      <div class="task-meta">
+        <span>Quét: ${t.totalScanned || 0}</span>
+        <span>✅ ${t.copiedFiles || 0}</span>
+        <span style="color:var(--warning)">⛔ ${blocked}</span>
+        <span style="color:var(--danger)">❌ ${failed}</span>
+        ${queued ? `<span style="color:var(--primary)">🔄 ${queued}</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function loadTasksStatus() {
+  jsonpRequest('list', {}, function (err, tasks) {
+    if (err) {
+      setApiStatus(false);
+      return;
+    }
+
+    setApiStatus(true);
+
+    globalTasksData = Array.isArray(tasks) ? tasks : [];
+
+    globalTasksData.sort((a, b) => {
+      const timeA = parseInt(String(a.id).split('_')[1] || '0', 10);
+      const timeB = parseInt(String(b.id).split('_')[1] || '0', 10);
+      return timeB - timeA;
     });
 
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById('timeStr').innerText = now.toLocaleTimeString('vi-VN', {hour12: false});
-      document.getElementById('dateStr').innerText = now.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' });
-    }, 1000);
+    updateNotifications();
 
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const autoSrc = urlParams.get('autoSrc');
-        if (autoSrc) document.getElementById('srcUrl').value = autoSrc;
-        
-        renderNotifications(); 
-        loadTasksStatus();
-        checkStorage(); 
-        if (!pollingStarted) {
-            pollingStarted = true;
-            setInterval(loadTasksStatus, 8000);
-        }
-    };
+    const runningTasks = globalTasksData.filter(t => !t.completed);
+    const historyTasks = globalTasksData.filter(t => t.completed);
 
-    function toggleNotiPopup(e) {
-      e.stopPropagation();
-      const popup = document.getElementById('notiPopup');
-      if (popup.style.display === 'flex') {
-         popup.style.display = 'none';
-      } else {
-         popup.style.display = 'flex';
-         if (unreadCount > 0) {
-             unreadCount = 0;
-             saveNotiState();
-             document.getElementById('notiBadge').style.display = 'none';
-         }
-      }
+    document.getElementById('stTotal').innerText =
+      globalTasksData.length;
+    document.getElementById('stRun').innerText =
+      runningTasks.length;
+    document.getElementById('stDone').innerText =
+      historyTasks.length;
+
+    const runContainer =
+      document.getElementById('runningListContainer');
+
+    runContainer.innerHTML =
+      runningTasks.length === 0
+        ? '<div style="text-align:center;color:var(--text-dim);padding:20px;">Không có tác vụ nào đang chạy.</div>'
+        : runningTasks.map(buildTaskHtml).join('');
+
+    const histContainer =
+      document.getElementById('historyListContainer');
+
+    histContainer.innerHTML =
+      historyTasks.length === 0
+        ? '<div style="text-align:center;color:var(--text-dim);padding:20px;">Chưa có tác vụ nào hoàn thành.</div>'
+        : historyTasks.map(buildTaskHtml).join('');
+
+    if (selectedTaskId) {
+      renderDetail(
+        globalTasksData.find(t => t.id === selectedTaskId) || null
+      );
     }
+  });
+}
 
-    function updateNotifications() {
-        let hasNew = false;
-        globalTasksData.forEach(t => {
-            if (t.completed && !notifiedTaskIds.has(t.id)) {
-                notifiedTaskIds.add(t.id);
-                notifications.unshift({
-                    id: t.id,
-                    name: t.taskName,
-                    time: new Date().toLocaleTimeString('vi-VN', {hour12: false})
-                });
-                unreadCount++;
-                hasNew = true;
-            }
-        });
-        if (hasNew) {
-            saveNotiState();
-            renderNotifications();
-        }
-    }
+function selectTask(taskId, e) {
+  selectedTaskId = taskId;
 
-    function renderNotifications() {
-        const badge = document.getElementById('notiBadge');
-        const list = document.getElementById('notiList');
-        
-        if (unreadCount > 0) {
-            badge.innerText = unreadCount;
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
-        }
+  document.querySelectorAll('.task-item')
+    .forEach(el => el.classList.remove('active-select'));
 
-        if (notifications.length > 0) {
-            list.innerHTML = notifications.map(n => `
-                <div class="noti-item">
-                    <div class="noti-icon">✔️</div>
-                    <div class="noti-content">
-                        <div class="noti-title">${escapeHtml(n.name)}</div>
-                        <div class="noti-time">${n.time}</div>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            list.innerHTML = '<div class="noti-empty">Không có thông báo nào.</div>';
-        }
-    }
+  if (e && e.currentTarget) {
+    e.currentTarget.classList.add('active-select');
+  }
 
-    function clearAllNotifications() {
-        notifications = [];
-        unreadCount = 0;
-        saveNotiState();
-        renderNotifications();
-        document.getElementById('notiPopup').style.display = 'none';
-    }
+  const task = globalTasksData.find(t => t.id === taskId);
+  renderDetail(task || null);
+}
 
-    function switchTab(tabId, el, isBottomNav = false) {
-      const items = isBottomNav ? document.querySelectorAll('.nav-item') : document.querySelectorAll('.menu-item');
-      items.forEach(i => i.classList.remove('active'));
-      if(el) el.classList.add('active');
+function getLogBadge(l) {
+  const reason = String(l.reason || '');
 
-      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active-page'));
-      document.getElementById(tabId).classList.add('active-page');
-      
-      selectedTaskId = null;
-      renderDetail(null);
-      document.querySelectorAll('.task-item').forEach(e => e.classList.remove('active-select'));
-    }
+  if (
+    reason.includes('Bị Google từ chối') ||
+    reason.includes('Bị từ chối quyền') ||
+    reason.includes('⛔')
+  ) {
+    return { text: 'CHẶN', color: 'var(--danger)' };
+  }
 
-    function escapeHtml(value) {
-      return String(value == null ? '' : value).replace(/[&<>'"]/g, function(c) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];
-      });
-    }
+  if (
+    reason.includes('Copy mới') ||
+    reason.includes('thành công')
+  ) {
+    return { text: 'MỚI', color: 'var(--success)' };
+  }
 
-    function jsonpRequest(action, params, callback, timeoutMs) {
-      const cb = 'cb_' + action + '_' + Math.random().toString(36).substring(2, 10);
-      const script = document.createElement('script');
-      let finished = false;
-      const query = Object.keys(params || {}).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
-      const finish = function() {
-        if (finished) return; finished = true; clearTimeout(timer);
-        try { delete window[cb]; } catch(e) {}
-        if (script.parentNode) script.parentNode.removeChild(script);
-      };
-      window[cb] = function(res) { finish(); callback(null, res); };
-      script.onerror = function() { finish(); callback(new Error('Lỗi kết nối.'), null); };
-      script.src = GAS_URL + '?action=' + encodeURIComponent(action) + (query ? '&' + query : '') + '&callback=' + cb;
-      document.body.appendChild(script);
-      const timer = setTimeout(function() {
-        if (finished) return; finish(); callback(new Error('Máy chủ phản hồi lâu.'), null);
-      }, timeoutMs || 30000);
-    }
+  if (reason.includes('Bỏ qua')) {
+    return { text: 'TRÙNG', color: 'var(--warning)' };
+  }
 
-    function checkStorage() {
-      jsonpRequest('quota', {}, function(err, res) {
-        if(!err && res && res.success) {
-          const usedGB = (res.used / (1024*1024*1024)).toFixed(2);
-          const limitGB = (res.limit / (1024*1024*1024)).toFixed(2);
-          const pct = (res.limit > 0) ? Math.min(100, Math.round((res.used / res.limit) * 100)) : 0;
-          document.getElementById('storageText').innerText = `${usedGB} / ${limitGB} GB`;
-          const bar = document.getElementById('storageBar');
-          bar.style.width = pct + '%';
-          if (pct > 90) bar.style.background = 'var(--danger)'; 
-        }
-      }, 15000);
-    }
+  if (
+    reason.includes('retry') ||
+    reason.includes('Lỗi tạm thời')
+  ) {
+    return { text: 'RETRY', color: 'var(--primary)' };
+  }
 
-    function setApiStatus(isOnline) {
-      const dot = document.getElementById('apiDot');
-      const text = document.getElementById('apiStatusText');
-      if (isOnline) {
-        dot.style.background = 'var(--success)'; dot.style.boxShadow = '0 0 10px var(--success)';
-        text.innerText = 'Server Online'; text.style.color = 'var(--success)';
-      } else {
-        dot.style.background = 'var(--danger)'; dot.style.boxShadow = '0 0 10px var(--danger)';
-        text.innerText = 'Mất kết nối'; text.style.color = 'var(--danger)';
-      }
-    }
+  if (
+    reason.includes('Lỗi') ||
+    reason.includes('❌')
+  ) {
+    return { text: 'LỖI', color: 'var(--danger)' };
+  }
 
-    let folderHistory = []; let currentFolderId = ''; let currentFolderName = 'My Drive';
-    function openFolderModal() { document.getElementById('folderModal').style.display = 'flex'; folderHistory = []; currentFolderId = ''; currentFolderName = 'My Drive'; loadFolderData(); }
-    function closeFolderModal() { document.getElementById('folderModal').style.display = 'none'; }
-    function loadFolderData() {
-      const topBar = document.getElementById('folderModalTopBar');
-      const listContainer = document.getElementById('folderListContainer');
-      
-      listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--primary);">Đang tải dữ liệu Drive...</div>';
+  return { text: 'INFO', color: 'var(--primary)' };
+}
 
-      let navHtml = currentFolderId 
-        ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size:12px;" onclick="goBackFolder(event)">🔙 Quay lại</button> <span style="font-weight:700; font-size:13px; margin-left: 8px;">${escapeHtml(currentFolderName)}</span>`
-        : `<span style="font-weight:800; font-size:13px;">📂 MY DRIVE</span>`;
-      topBar.innerHTML = navHtml;
+function renderDetail(task) {
+  const isHistoryTab =
+    document.getElementById('tab-history')
+      .classList.contains('active-page');
 
-      jsonpRequest('getFolders', { parentId: currentFolderId }, function(err, res) {
-        if (err || !res.success) { 
-           let errorDetail = err ? err.message : (res ? res.error : "Lỗi không xác định");
-           listContainer.innerHTML = `<div style="color:var(--danger); text-align:center; padding: 20px;"><b>Lỗi tải thư mục</b><br><span style="font-size:12px; color:var(--text-dim); margin-top:8px; display:block;">Chi tiết: ${escapeHtml(errorDetail)}</span></div>`; 
-           return; 
-        }
-        let html = '';
-        if (currentFolderId) { html += `<button class="btn btn-primary" style="width:100%; margin-bottom:12px; background: rgba(16,185,129,0.2); color:var(--success);" onclick="selectFolder('${currentFolderId}', event)">✔️ CHỌN THƯ MỤC NÀY</button>`; }
-        if (!res.folders || res.folders.length === 0) { html += '<div style="text-align:center; color:var(--text-dim);">Thư mục trống.</div>'; } 
-        else {
-          res.folders.forEach(f => {
-             let safeName = f.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-             html += `<div class="task-item" style="display:flex; justify-content:space-between; align-items:center; padding: 10px;" onclick="navToFolder('${f.id}', '${safeName}', event)">
-                        <span style="font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📁 ${escapeHtml(f.name)}</span>
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size:11px; flex-shrink: 0;" onclick="selectFolder('${f.id}', event); event.stopPropagation();">Chọn</button>
-                      </div>`;
-          });
-        }
-        listContainer.innerHTML = html;
-      });
-    }
-    function navToFolder(id, name, e) { if(e) e.stopPropagation(); folderHistory.push({id: currentFolderId, name: currentFolderName}); currentFolderId = id; currentFolderName = name; loadFolderData(); }
-    function goBackFolder(e) { if(e) e.stopPropagation(); if(folderHistory.length > 0) { let prev = folderHistory.pop(); currentFolderId = prev.id; currentFolderName = prev.name; } else { currentFolderId = ''; currentFolderName = 'My Drive'; } loadFolderData(); }
-    function selectFolder(id, e) { if(e) e.stopPropagation(); document.getElementById('dstUrl').value = 'https://drive.google.com/drive/folders/' + id; closeFolderModal(); }
+  const titleEl = document.getElementById(
+    isHistoryTab ? 'historyDetailTitle' : 'overviewDetailTitle'
+  );
 
-    function startNewTask() {
-      if (requestBusy) return alert('Hệ thống đang bận...');
-      const srcText = document.getElementById('srcUrl').value.trim();
-      const dst = document.getElementById('dstUrl').value.trim();
-      if (!srcText || !dst) return alert('Nhập đủ Nguồn và Đích!');
+  const containerEl = document.getElementById(
+    isHistoryTab
+      ? 'historyDetailContainer'
+      : 'overviewDetailContainer'
+  );
 
-      let uniqueLinks = [...new Set(srcText.match(/(https:\/\/[a-zA-Z0-9.-]*google\.com\/[^\s'"]+)/g) || [])];
-      if (uniqueLinks.length === 0) uniqueLinks = [srcText];
+  const btnKill = document.getElementById(
+    isHistoryTab ? 'btnKillHistory' : 'btnKillOverview'
+  );
 
-      const btn = document.getElementById('btnStart');
-      requestBusy = true; 
-      btn.disabled = true; 
-      btn.innerHTML = `⏳ ĐANG KHỞI TẠO TÁC VỤ...`; 
+  const otherContainer = document.getElementById(
+    isHistoryTab
+      ? 'overviewDetailContainer'
+      : 'historyDetailContainer'
+  );
 
-      // NÂNG CẤP: Hàm chạy Bypass 
-      const runBatch = function() {
-        jsonpRequest('create_batch', {srcList: JSON.stringify(uniqueLinks), dst: dst}, function(err, res) {
-          requestBusy = false; 
-          if (err) {
-             btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
-             return alert(err.message);
-          }
-          if (res && res.success) {
-            document.getElementById('srcUrl').value = ''; document.getElementById('dstUrl').value = '';
-            loadTasksStatus(); checkStorage();
-            
-            btn.style.background = 'var(--success)';
-            btn.innerHTML = `✔️ ĐÃ ĐƯA VÀO HÀNG ĐỢI`;
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.style.background = '';
-                btn.innerHTML = `▶ BẮT ĐẦU SAO CHÉP`;
-            }, 3000);
-          } else { 
-            btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
-            alert('Lỗi: ' + (res ? res.error : 'Unknown')); 
-          }
-        }); 
-      };
+  const otherBtn = document.getElementById(
+    isHistoryTab ? 'btnKillOverview' : 'btnKillHistory'
+  );
 
-      // Kiểm tra xem người dùng có TÍCH vào ô "Tự động kiểm tra quyền" không
-      const isCheckEnabled = document.getElementById('chkCheckAccess').checked;
+  otherContainer.innerHTML =
+    '<div style="text-align:center;color:var(--text-dim);padding:20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
 
-      if (isCheckEnabled) {
-          jsonpRequest('diagnose', {src: uniqueLinks[0], dst: dst}, function(diagErr, diag) {
-            if (diagErr || !diag || !diag.success) {
-              requestBusy = false; btn.disabled = false; btn.innerHTML = '▶ BẮT ĐẦU SAO CHÉP';
-              
-              // HIỂN THỊ LỖI RÕ RÀNG HƠN
-              let errStr = diagErr ? diagErr.message : (diag ? ("- Nguồn: " + (diag.source.error||"OK") + "\n- Đích: " + (diag.destination.error||"OK")) : "Lỗi mạng");
-              
-              return alert('Lỗi kiểm tra quyền truy cập (Hoặc định dạng link bị sai)!\n\nChi tiết:\n' + errStr + '\n\n💡 MẸO: Nếu bạn chắc chắn link này ĐÚNG, hãy BỎ TÍCH ô "Tự động kiểm tra quyền truy cập" để ép hệ thống chạy!');
-            }
-            runBatch();
-          });
-      } else {
-          // Bỏ qua kiểm tra, ÉP CHẠY LUÔN
-          runBatch();
-      }
-    }
+  otherBtn.style.display = 'none';
 
-    function buildTaskHtml(t) {
-        const id = escapeHtml(t.id);
-        const name = escapeHtml(t.taskName);
-        const isDone = t.completed;
-        const status = isDone ? 'Hoàn thành' : 'Đang chạy';
-        const badgeClass = isDone ? 'success' : 'running';
-        const pct = Math.max(0, Math.min(100, Number(t.progressPercent) || 0));
-        const isActive = (id === selectedTaskId) ? 'active-select' : '';
-        
-        return `
-          <div class="task-item ${isActive}" onclick="selectTask('${id}')">
-            <div class="task-top">
-              <div class="task-name" title="${name}">${name}</div>
-              <div class="badge ${badgeClass}">${status}</div>
-            </div>
-            <div style="font-size:12px; color:var(--text-dim);">${pct}% - ${escapeHtml(t.lastFile || '')}</div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
-            <div class="task-meta">
-              <span>Quét: ${t.totalScanned||0}</span>
-              <span>Tốt: ${t.copiedFiles||0}</span>
-              <span style="color:var(--danger)">Lỗi: ${(t.skippedFiles||0) + (t.queuedFiles||0)}</span>
-            </div>
-          </div>`;
-    }
+  if (!task) {
+    containerEl.innerHTML =
+      '<div style="text-align:center;color:var(--text-dim);padding:20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
 
-    function loadTasksStatus() {
-      jsonpRequest('list', {}, function(err, tasks) {
-        if (err) { setApiStatus(false); return; }
-        setApiStatus(true);
-        globalTasksData = tasks || [];
-        
-        globalTasksData.sort((a, b) => {
-            let timeA = parseInt(a.id.split('_')[1]) || 0;
-            let timeB = parseInt(b.id.split('_')[1]) || 0;
-            return timeB - timeA;
-        });
-        
-        updateNotifications(); 
+    btnKill.style.display = 'none';
+    titleEl.innerText =
+      isHistoryTab ? 'Chi tiết lịch sử' : 'Chi tiết tác vụ';
 
-        const runningTasks = globalTasksData.filter(t => !t.completed);
-        const historyTasks = globalTasksData.filter(t => t.completed);
+    return;
+  }
 
-        document.getElementById('stTotal').innerText = tasks.length;
-        document.getElementById('stRun').innerText = runningTasks.length;
-        document.getElementById('stDone').innerText = historyTasks.length;
+  titleEl.innerText = task.taskName;
+  btnKill.style.display = 'block';
+  btnKill.innerText = isHistoryTab
+    ? 'Xóa bản ghi'
+    : 'Hủy tác vụ';
 
-        const runContainer = document.getElementById('runningListContainer');
-        if (runningTasks.length === 0) runContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px;">Không có tác vụ nào đang chạy.</div>';
-        else runContainer.innerHTML = runningTasks.map(buildTaskHtml).join('');
+  const logs = (task.scannedList || [])
+    .slice()
+    .reverse()
+    .map(l => {
+      const badge = getLogBadge(l);
 
-        const histContainer = document.getElementById('historyListContainer');
-        if (historyTasks.length === 0) histContainer.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px;">Chưa có tác vụ nào hoàn thành.</div>';
-        else histContainer.innerHTML = historyTasks.map(buildTaskHtml).join('');
-        
-        if(selectedTaskId) renderDetail(globalTasksData.find(t => t.id === selectedTaskId));
-      });
-    }
+      return `
+        <div class="log-line">
+          <span class="log-badge"
+                style="background:rgba(255,255,255,.1);color:${badge.color};border:1px solid ${badge.color};">
+            ${badge.text}
+          </span>
+          <span style="word-break:break-word;">
+            ${escapeHtml(l.name)}
+            <span style="opacity:.7;"> — ${escapeHtml(l.reason || '')}</span>
+          </span>
+        </div>`;
+    })
+    .join('');
 
-    function selectTask(taskId) {
-      selectedTaskId = taskId;
-      const task = globalTasksData.find(t => t.id === taskId);
-      document.querySelectorAll('.task-item').forEach(el => el.classList.remove('active-select'));
-      event.currentTarget.classList.add('active-select');
-      renderDetail(task);
-    }
+  const logHtml = logs ||
+    'Hệ thống đang khởi tạo log...';
 
-    function renderDetail(task) {
-      const isHistoryTab = document.getElementById('tab-history').classList.contains('active-page');
-      
-      const titleEl = document.getElementById(isHistoryTab ? 'historyDetailTitle' : 'overviewDetailTitle');
-      const containerEl = document.getElementById(isHistoryTab ? 'historyDetailContainer' : 'overviewDetailContainer');
-      const btnKill = document.getElementById(isHistoryTab ? 'btnKillHistory' : 'btnKillOverview');
-      
-      const otherContainer = document.getElementById(isHistoryTab ? 'overviewDetailContainer' : 'historyDetailContainer');
-      const otherBtn = document.getElementById(isHistoryTab ? 'btnKillOverview' : 'btnKillHistory');
-      otherContainer.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
-      otherBtn.style.display = 'none';
+  const blocked = Number(task.blockedFiles || 0);
+  const failed = Number(task.failedFiles || 0);
+  const duplicates = Number(task.duplicateFiles || 0);
+  const queued = Number(task.queuedFiles || 0);
 
-      if(!task) {
-        containerEl.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Bấm vào một tác vụ để xem chi tiết.</div>';
-        btnKill.style.display = 'none';
-        titleEl.innerText = isHistoryTab ? "Chi tiết lịch sử" : "Chi tiết tác vụ";
+  containerEl.innerHTML = `
+    <div class="detail-row">
+      <span class="detail-label">ID Tác vụ</span>
+      <span class="detail-val" style="font-family:monospace;color:var(--primary);">
+        ${escapeHtml(task.id)}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Trạng thái</span>
+      <span class="detail-val">${escapeHtml(task.statusMsg || '')}</span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Tiến độ tổng</span>
+      <span class="detail-val">${Number(task.progressPercent || 0)}%</span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Tổng file đã quét</span>
+      <span class="detail-val">${Number(task.totalScanned || 0)}</span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">✅ Sao chép thành công</span>
+      <span class="detail-val" style="color:var(--success);">
+        ${Number(task.copiedFiles || 0)}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">↪️ File trùng / bỏ qua</span>
+      <span class="detail-val" style="color:var(--warning);">
+        ${duplicates}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">⛔ Bị Google từ chối</span>
+      <span class="detail-val" style="color:var(--danger);">
+        ${blocked}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">❌ Lỗi khác</span>
+      <span class="detail-val" style="color:var(--danger);">
+        ${failed}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">🔄 Đang retry</span>
+      <span class="detail-val" style="color:var(--primary);">
+        ${queued}
+      </span>
+    </div>
+
+    <div style="margin-top:20px;font-weight:700;font-size:13px;color:var(--primary);">
+      Nhật ký hoạt động
+    </div>
+
+    <div class="log-box">${logHtml}</div>
+  `;
+}
+
+function killSelectedTask() {
+  const selected = globalTasksData.find(
+    t => t.id === selectedTaskId
+  );
+
+  const isHistory = !!(selected && selected.completed);
+
+  const msg = isHistory
+    ? 'Xóa bản ghi lịch sử này?'
+    : 'Xác nhận hủy tác vụ đang chạy? Dữ liệu đã copy sẽ không bị mất.';
+
+  if (!selectedTaskId || !confirm(msg)) return;
+
+  jsonpRequest(
+    'kill',
+    { id: selectedTaskId },
+    function (err) {
+      if (err) {
+        alert(err.message);
         return;
       }
 
-      titleEl.innerText = task.taskName;
-      btnKill.style.display = 'block';
-      btnKill.innerText = isHistoryTab ? "Xóa bản ghi" : "Hủy tác vụ";
-      
-      let logs = (task.scannedList || []).reverse().map(l => {
-          let badgeText = "Đang xử lý"; let badgeColor = "var(--primary)";
-          if (l.reason && l.reason.includes("Copy mới") || l.reason.includes("thành công")) { badgeText = "MỚI"; badgeColor = "var(--success)"; }
-          if (l.reason && l.reason.includes("Bỏ qua")) { badgeText = "TRÙNG"; badgeColor = "var(--warning)"; }
-          if (l.reason && l.reason.includes("Lỗi")) { badgeText = "LỖI"; badgeColor = "var(--danger)"; }
-          
-          return `<div class="log-line">
-                     <span class="log-badge" style="background: rgba(255,255,255,0.1); color: ${badgeColor}; border: 1px solid ${badgeColor};">${badgeText}</span> 
-                     ${escapeHtml(l.name)}
-                  </div>`;
-      }).join('');
-      if(!logs) logs = "Hệ thống đang khởi tạo log...";
-
-      containerEl.innerHTML = `
-        <div class="detail-row"><span class="detail-label">ID Tác vụ</span><span class="detail-val" style="font-family:monospace; color:var(--primary);">${task.id}</span></div>
-        <div class="detail-row"><span class="detail-label">Trạng thái</span><span class="detail-val ${task.completed ? 'text-success' : 'text-primary'}">${task.statusMsg}</span></div>
-        <div class="detail-row"><span class="detail-label">Tiến độ tổng</span><span class="detail-val">${task.progressPercent}%</span></div>
-        <div class="detail-row"><span class="detail-label">Tổng File đã quét</span><span class="detail-val">${task.totalScanned}</span></div>
-        <div class="detail-row"><span class="detail-label">Sao chép thành công</span><span class="detail-val" style="color:var(--success);">${task.copiedFiles}</span></div>
-        <div class="detail-row"><span class="detail-label">Đang chờ xử lý (Kẹt)</span><span class="detail-val" style="color:var(--warning);">${task.queuedFiles}</span></div>
-        <div class="detail-row"><span class="detail-label">Bỏ qua (Lỗi/Shortcut)</span><span class="detail-val" style="color:var(--danger);">${task.skippedFiles}</span></div>
-        
-        <div style="margin-top:20px; font-weight:700; font-size:13px; color:var(--primary);">Nhật ký hoạt động (Lưu 50 tệp gần nhất)</div>
-        <div class="log-box">${logs}</div>
-      `;
+      selectedTaskId = null;
+      renderDetail(null);
+      loadTasksStatus();
     }
-
-    function killSelectedTask() {
-      const isHistory = globalTasksData.find(t => t.id === selectedTaskId)?.completed;
-      const msg = isHistory ? 'Xóa bản ghi lịch sử này?' : 'Xác nhận hủy tác vụ đang chạy? Dữ liệu đã copy sẽ không bị mất.';
-      if(!selectedTaskId || !confirm(msg)) return;
-      jsonpRequest('kill', {id: selectedTaskId}, function(err) {
-        if(err) alert(err.message);
-        selectedTaskId = null;
-        renderDetail(null);
-        loadTasksStatus();
-      });
-    }
-  </script>
+  );
+}
+</script>
 </body>
 </html>
