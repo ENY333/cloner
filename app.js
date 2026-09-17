@@ -40,12 +40,10 @@ const catalog = {
   },
   google: {
     title: "Công cụ Google",
-    subtitle: "Tiện ích cho Drive, Sheets và hệ sinh thái Google.",
+    subtitle: "Sao chép, quản lý Drive và theo dõi tác vụ trong một nơi.",
     icon: "G",
     tools: [
-      ["drive-cloner","Sao chép Drive","Sao chép tệp và thư mục được hỗ trợ qua Google Drive.","DRIVE","G"],
-      ["drive-manager","Quản lý Drive","Quản lý tệp, thư mục, liên kết và thông tin tệp.","DRIVE","◫"],
-      ["sheets-tools","Công cụ Sheets","Tiện ích cho dữ liệu và tự động hóa Google Sheets.","SHEETS","▦"]
+      ["drive-cloner","Drive Cloner Pro","Sao chép Drive, xem dung lượng và lịch sử tác vụ trong một ứng dụng.","GOOGLE DRIVE","G"]
     ]
   },
   developer: {
@@ -78,7 +76,7 @@ const toolRegistry = Object.fromEntries(
 
 const content = document.getElementById("content");
 const toastEl = document.getElementById("toast");
-const pageName = document.getElementById("pageName");
+const pageName = document.getElementById("pageName") || { textContent: "" };
 const globalSearch = document.getElementById("globalSearch");
 
 function saveState(){
@@ -420,26 +418,44 @@ function toolOcrStudio(){
 function toolDriveCloner(){
   const t=toolRegistry["drive-cloner"];
   toolHeader(t,`
-    <div class="workspace-header"><h2>Drive Cloner</h2><span>Vercel → GAS → Drive</span></div>
-    <div class="tool-row"><input class="input" id="srcId" placeholder="ID tệp/thư mục nguồn"><input class="input" id="dstId" placeholder="ID thư mục đích"></div>
-    <div class="actionbar"><button class="primary" id="cloneDrive">Bắt đầu sao chép</button><button class="secondary" id="checkDrive">Kiểm tra API</button></div>
-    <div class="output" id="driveOut">Đang chờ thao tác...</div>
+    <div class="workspace-header"><h2>Drive Cloner Pro</h2><span>Sao chép • dung lượng • lịch sử tác vụ</span></div>
+    <div class="tool-row"><input class="input" id="srcId" placeholder="ID hoặc link tệp nguồn"><input class="input" id="dstId" placeholder="ID hoặc link thư mục đích"></div>
+    <div class="actionbar"><button class="primary" id="cloneDrive">Bắt đầu sao chép</button><button class="secondary" id="checkDrive">Kiểm tra kết nối</button><button class="secondary" id="showQuota">Xem dung lượng</button><button class="secondary" id="loadTasks">Lịch sử tác vụ</button></div>
+    <div class="output" id="driveOut">Sẵn sàng kết nối với Google Drive.</div>
+    <div class="file-list" id="taskList" aria-live="polite"></div>
   `);
   async function call(action, params={}){
     const u=new URL("/api/gas",location.origin);u.searchParams.set("action",action);
     Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
     const r=await fetch(u),txt=await r.text();
     let d;try{d=JSON.parse(txt)}catch{throw new Error("API không trả JSON")}
-    if(!r.ok||d.ok===false)throw new Error(d.error||`HTTP ${r.status}`); return d;
+    if(!r.ok||d.ok===false||d.success===false)throw new Error(d.error||d.message||`HTTP ${r.status}`); return d;
   }
-  document.getElementById("checkDrive").onclick=async()=>{
-    try{const d=await call("health");document.getElementById("driveOut").textContent=d.message||"API OK"}catch(e){document.getElementById("driveOut").textContent="❌ "+e.message}
+  const out=document.getElementById("driveOut"), list=document.getElementById("taskList");
+  const action=(button, work)=>button.onclick=async()=>{
+    button.disabled=true;
+    try{await work()}catch(e){out.textContent="❌ "+e.message}finally{button.disabled=false}
   };
-  document.getElementById("cloneDrive").onclick=async()=>{
+  action(document.getElementById("checkDrive"), async()=>{
+    const d=await call("health"); out.textContent=d.message||"✓ Kết nối Google Drive đang hoạt động.";
+  });
+  action(document.getElementById("cloneDrive"), async()=>{
     const src=document.getElementById("srcId").value.trim(),dst=document.getElementById("dstId").value.trim();
-    if(!src||!dst){document.getElementById("driveOut").textContent="Nhập source và destination.";return}
-    try{const d=await call("create_batch",{src,dst});document.getElementById("driveOut").textContent=JSON.stringify(d,null,2)}catch(e){document.getElementById("driveOut").textContent="❌ "+e.message}
-  };
+    if(!src||!dst){out.textContent="Nhập tệp nguồn và thư mục đích.";return}
+    const d=await call("create_batch",{src,dst});out.textContent=d.message||"✓ Đã gửi yêu cầu sao chép.";
+  });
+  action(document.getElementById("showQuota"), async()=>{
+    const d=await call("quota"), quota=d.quota||d.data||d;
+    const used=quota.used ?? quota.storageUsed, limit=quota.limit ?? quota.storageLimit;
+    out.textContent=Number.isFinite(Number(used))&&Number.isFinite(Number(limit))
+      ? `Đã dùng ${fmtBytes(Number(used))} / ${fmtBytes(Number(limit))}.`
+      : JSON.stringify(d,null,2);
+  });
+  action(document.getElementById("loadTasks"), async()=>{
+    const d=await call("list"), tasks=Array.isArray(d.tasks)?d.tasks:[];
+    out.textContent=tasks.length?`Có ${tasks.length} tác vụ gần đây.`:"Chưa có tác vụ nào.";
+    list.innerHTML=tasks.map(task=>`<div class="file-row"><span class="name">${esc(task.name||"Tác vụ Drive")}</span><span class="size">${esc(task.status||"đang xử lý")} · ${esc(task.message||"")}</span></div>`).join("");
+  });
 }
 
 function toolGeneric(t){
