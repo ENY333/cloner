@@ -43,7 +43,7 @@ const catalog = {
     subtitle: "Sao chép, quản lý Drive và theo dõi tác vụ trong một nơi.",
     icon: "G",
     tools: [
-      ["drive-cloner","Drive Cloner Pro","Sao chép Drive, xem dung lượng và lịch sử tác vụ trong một ứng dụng.","GOOGLE DRIVE","G"]
+      ["drive-cloner","Google Drive Pro","Sao chép Drive, xem dung lượng và lịch sử tác vụ trong một ứng dụng.","GOOGLE DRIVE","G"]
     ]
   },
   developer: {
@@ -78,6 +78,13 @@ const content = document.getElementById("content");
 const toastEl = document.getElementById("toast");
 const pageName = document.getElementById("pageName") || { textContent: "" };
 const globalSearch = document.getElementById("globalSearch");
+const topbarTitle = document.getElementById("topbarTitle");
+const topbarDescription = document.getElementById("topbarDescription");
+
+function setTopbarContext(title, description = ""){
+  topbarTitle.textContent = title;
+  topbarDescription.textContent = description;
+}
 
 function saveState(){
   localStorage.setItem("toolverse:favorites", JSON.stringify(state.favorites));
@@ -139,6 +146,7 @@ function renderHome(){
   const favorites = state.favorites.map(id => toolRegistry[id]).filter(Boolean);
   const recent = state.recent.map(id => toolRegistry[id]).filter(Boolean);
   pageName.textContent = "Trang chủ";
+  setTopbarContext("ToolVerse", "Không gian công cụ tổng hợp");
 
   content.innerHTML = `
     <section class="hero">
@@ -222,8 +230,8 @@ function renderHome(){
 function renderCategory(key){
   const g=catalog[key];
   pageName.textContent=g.title;
+  setTopbarContext(g.title, g.subtitle);
   content.innerHTML=`
-    <div class="page-title"><h1>${g.icon} ${esc(g.title)}</h1><p>${esc(g.subtitle)}</p></div>
     <div class="section-head"><div><h2>Công cụ</h2><p>${g.tools.length} công cụ trong danh mục này.</p></div></div>
     <div class="card-grid">${g.tools.map(toolCard).join("")}</div>
   `;
@@ -232,9 +240,9 @@ function renderCategory(key){
 
 function renderSimplePage(key,title,desc,items){
   pageName.textContent=title;
+  setTopbarContext(title, desc);
   const tools=items.map(id=>toolRegistry[id]).filter(Boolean);
   content.innerHTML=`
-    <div class="page-title"><h1>${esc(title)}</h1><p>${esc(desc)}</p></div>
     <div class="section-head"><div><h2>${tools.length ? "Công cụ của bạn" : "Chưa có gì ở đây"}</h2><p>${tools.length?"Chọn một công cụ để tiếp tục.":"Các công cụ bạn sử dụng sẽ xuất hiện tại đây."}</p></div></div>
     ${tools.length?`<div class="card-grid">${tools.map(t=>toolCard([t.id,t.name,t.desc,t.tag,t.icon])).join("")}</div>`:`<div class="empty">Chưa có dữ liệu.</div>`}
   `;
@@ -243,9 +251,9 @@ function renderSimplePage(key,title,desc,items){
 
 function renderAllTools(){
   pageName.textContent="Tất cả công cụ";
+  setTopbarContext("Tất cả công cụ", "Toàn bộ tiện ích trong ToolVerse.");
   const groups=Object.entries(catalog);
   content.innerHTML=`
-    <div class="page-title"><h1>Tất cả công cụ</h1><p>Toàn bộ công cụ hiện có trong ToolVerse.</p></div>
     ${groups.map(([k,g])=>`<div class="section-head"><div><h2>${g.icon} ${esc(g.title)}</h2><p>${g.tools.length} công cụ</p></div><button class="secondary" data-route="${k}">Mở danh mục</button></div><div class="card-grid">${g.tools.map(toolCard).join("")}</div>`).join("")}
   `;
   bindCards();
@@ -253,8 +261,8 @@ function renderAllTools(){
 
 function renderSettings(){
   pageName.textContent="Cài đặt";
+  setTopbarContext("Cài đặt", "Thiết lập không gian ToolVerse.");
   content.innerHTML=`
-    <div class="page-title"><h1>Cài đặt</h1><p>Thiết lập workspace và trải nghiệm ToolVerse.</p></div>
     <div class="setting-grid" style="margin-top:18px">
       <div class="setting-card">
         <h3>Giao diện</h3><p>Chuyển accent theme của giao diện.</p>
@@ -304,7 +312,8 @@ function openTool(id){
 }
 
 function toolHeader(t, body){
-  content.innerHTML=`<div class="page-title"><h1>${esc(t.icon)} ${esc(t.name)}</h1><p>${esc(t.desc)}</p></div><div class="tool-workspace">${body}</div>`;
+  setTopbarContext(t.name, t.desc);
+  content.innerHTML=`<div class="tool-workspace">${body}</div>`;
 }
 
 function toolJson(){
@@ -418,7 +427,7 @@ function toolOcrStudio(){
 function toolDriveCloner(){
   const t=toolRegistry["drive-cloner"];
   toolHeader(t,`
-    <div class="workspace-header"><h2>Drive Cloner Pro</h2><span>Sao chép • dung lượng • lịch sử tác vụ</span></div>
+    <div class="workspace-header"><h2>Google Drive Pro</h2><span>Sao chép • dung lượng • lịch sử tác vụ</span></div>
     <div class="tool-row"><input class="input" id="srcId" placeholder="ID hoặc link tệp nguồn"><input class="input" id="dstId" placeholder="ID hoặc link thư mục đích"></div>
     <div class="actionbar"><button class="primary" id="cloneDrive">Bắt đầu sao chép</button><button class="secondary" id="checkDrive">Kiểm tra kết nối</button><button class="secondary" id="showQuota">Xem dung lượng</button><button class="secondary" id="loadTasks">Lịch sử tác vụ</button></div>
     <div class="output" id="driveOut">Sẵn sàng kết nối với Google Drive.</div>
@@ -514,8 +523,8 @@ globalSearch.addEventListener("input",()=>{
   if(!q){render();return}
   pageName.textContent="Tìm kiếm";
   const results=Object.values(toolRegistry).filter(t=>(t.name+" "+t.desc+" "+t.tag).toLowerCase().includes(q));
-  content.innerHTML=`<div class="page-title"><h1>Tìm kiếm</h1><p>${results.length} kết quả cho “${esc(q)}”</p></div>
-    <div class="card-grid" style="margin-top:18px">${results.length?results.map(t=>toolCard([t.id,t.name,t.desc,t.tag,t.icon])).join(""):`<div class="empty">Không tìm thấy tool phù hợp.</div>`}</div>`;
+  setTopbarContext("Tìm kiếm", `${results.length} kết quả cho “${q}”`);
+  content.innerHTML=`<div class="card-grid">${results.length?results.map(t=>toolCard([t.id,t.name,t.desc,t.tag,t.icon])).join(""):`<div class="empty">Không tìm thấy tool phù hợp.</div>`}</div>`;
   bindCards();
 });
 document.addEventListener("keydown",e=>{
